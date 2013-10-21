@@ -407,6 +407,10 @@ public class Main {
                 List<String> lines = new ArrayList<>();
                 while (in.hasNextLine()) lines.add(in.nextLine());
                 in.close();
+				System.out.println("*******************************");
+				for (int x = 0; x < lines.size(); x++)
+					System.out.println(lines.get(x));
+				System.out.println("*******************************");
             	args[i][0] = calls.getArgs(i);
                 if (lines.size() == 3 && Arrays.asList("true", "false").contains(lines.get(2))) {
                 	expected[i] = lines.get(0);
@@ -430,11 +434,8 @@ public class Main {
     	// TODO: Discover from file extension
     	String languageName = System.getProperty("com.horstmann.codecheck.language");
     	if (languageName != null) {
-    		try {
-				language = (Language) Class.forName(languageName + "Language").newInstance();
-			} catch (InstantiationException | IllegalAccessException
-					| ClassNotFoundException e) {
-				report.error("Cannot process language " + languageName);
+			if (languageName.compareToIgnoreCase("Python") == 0) {
+				language = new PythonLanguage();	
 			}
     	}
     	
@@ -514,18 +515,6 @@ public class Main {
             }
         	
             report.comment("ID: " + problemId);
-            
-            // Used to pass in machine instance into report 
-            for (int iarg = 3; iarg < args.length; iarg++) {
-            	String arg = args[iarg];
-            	int keyEnd = arg.indexOf("=");
-            	if (keyEnd >= 0) {
-            		report.comment(arg.substring(0, keyEnd) + ": " + arg.substring(keyEnd + 1));
-            	}
-            }
-            
-            
-            
         	timeoutMillis = DEFAULT_TIMEOUT_MILLIS;
             String timeoutProperty = System.getProperty("com.horstmann.codecheck.timeout");
             if (timeoutProperty != null)
