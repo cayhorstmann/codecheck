@@ -127,7 +127,7 @@ jar cf $REPORT_JAR .
 
 cd "$WORKDIR"
 
-LC_ALL=en_US.UTF-8 java -Dcom.horstmann.codecheck $JAVA_OPTS -classpath "$CLASSPATH" com.horstmann.codecheck.Main $LEVEL "$SUBMISSIONDIR" "$PROBLEMDIR" "$TITLE"
+LC_ALL=en_US.UTF-8 java -Dcom.horstmann.codecheck.language=Python $JAVA_OPTS -classpath "$CLASSPATH" com.horstmann.codecheck.Main $LEVEL "$SUBMISSIONDIR" "$PROBLEMDIR" "$TITLE"
 cd - > /dev/null
 $BROWSER "$SUBMISSIONDIR/$REPORT"
 cd "$SUBMISSIONDIR"
@@ -178,7 +178,7 @@ if [ -z $3 ] ; then
       SUBMISSIONDIR2=`cygpath -w $SUBMISSIONDIR2`
   fi
 
-  LC_ALL=en_US.UTF-8 java -Dcom.horstmann.codecheck $JAVA_OPTS -classpath "$CLASSPATH" com.horstmann.codecheck.Main $LEVEL "$SUBMISSIONDIR2" "$PROBLEMDIR" "$TITLE"
+  LC_ALL=en_US.UTF-8 java -Dcom.horstmann.codecheck.language=Python $JAVA_OPTS -classpath "$CLASSPATH" com.horstmann.codecheck.Main $LEVEL "$SUBMISSIONDIR2" "$PROBLEMDIR" "$TITLE"
   cd - > /dev/null
   $BROWSER "$SUBMISSIONDIR2/$REPORT"
 fi
