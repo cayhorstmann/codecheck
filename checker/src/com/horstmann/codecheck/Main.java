@@ -407,10 +407,11 @@ public class Main {
                 List<String> lines = new ArrayList<>();
                 while (in.hasNextLine()) lines.add(in.nextLine());
                 in.close();
-				System.out.println("*******************************");
-				for (int x = 0; x < lines.size(); x++)
-					System.out.println(lines.get(x));
-				System.out.println("*******************************");
+//				System.out.println("*******************************");
+//				for (int x = 0; x < lines.size(); x++)
+//					System.out.println(lines.get(x));
+//				System.out.println("*******************************");
+//				System.out.println("GOT HEREEEEE !!!!!!");
             	args[i][0] = calls.getArgs(i);
                 if (lines.size() == 3 && Arrays.asList("true", "false").contains(lines.get(2))) {
                 	expected[i] = lines.get(0);
@@ -431,13 +432,17 @@ public class Main {
         // TODO: Adjustable Timeouts
 
     	
-    	// TODO: Discover from file extension
-    	String languageName = System.getProperty("com.horstmann.codecheck.language");
-    	if (languageName != null) {
-			if (languageName.compareToIgnoreCase("Python") == 0) {
-				language = new PythonLanguage();	
-			}
-    	}
+    	 // TODO: Discover from file extension
+        String languageName = System.getProperty("com.horstmann.codecheck.language");
+        if (languageName != null) {
+        	if (languageName.compareToIgnoreCase("Python") == 0) {
+        		language = new PythonLanguage();
+            } else if (languageName.compareToIgnoreCase("C") == 0) {
+        		language = new CLanguage();
+            } else {
+            	language = new JavaLanguage();
+            }
+        }
     	
         String mode = args[0].trim();
         Path submissionDir = FileSystems.getDefault().getPath(args[1]);

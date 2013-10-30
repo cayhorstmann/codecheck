@@ -71,20 +71,11 @@ public class Files {
         StringBuilder result = new StringBuilder();
         result.append(start);
 
-        Path unzipDir = null;
-        Path problemPath;
-        
-        // TODO: Eventually all are
-        if (Util.isOnS3(repo, problemName)) {
-        	problemPath = Util.unzipFromS3(repo, problemName);
-        	unzipDir = problemPath.getParent();
-        } else {        
-	        Path repoPath = Paths.get(context
-	                                  .getInitParameter("com.horstmann.codecheck.repo." + repo));
-	        // TODO: That comes from Problems.java--fix it there
-	        if (problemName.startsWith("/")) problemName = problemName.substring(1);
-	        problemPath = repoPath.resolve(problemName);
-        }
+        Path repoPath = Paths.get(context
+                                  .getInitParameter("com.horstmann.codecheck.repo." + repo));
+        // TODO: That comes from Problems.java--fix it there
+        if (problemName.startsWith("/")) problemName = problemName.substring(1);
+        Path problemPath = repoPath.resolve(problemName);
         Problem problem = new Problem(problemPath, level);
         boolean includeCode = true;
         String description = getDescription(problemPath, "statement.html"); // TODO: Legacy
@@ -165,7 +156,6 @@ public class Files {
 
         result.append(MessageFormat.format(after, repo, problemName, level));
         result.append(end);
-        if (unzipDir != null) Util.deleteDirectory(unzipDir);
         return result.toString();
     }
 

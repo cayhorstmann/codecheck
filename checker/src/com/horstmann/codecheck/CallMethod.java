@@ -136,12 +136,12 @@ public class CallMethod {
             Class<?> cl = loader.loadClass(className);
 
             outcome = true;
-            for (int i = 0; i < n; i++) {
-                List<String> paramValues = getParameterValues(i + 1);
+            for (int i = 1; i <= n; i++) {
+                List<String> paramValues = getParameterValues(i);
                 Object actualRet = null;
                 Throwable thrown = null;
                 try {
-                    actualRet = callMethod(cl, i + 1, paramValues);
+                    actualRet = callMethod(cl, i, paramValues);
                 } catch (InvocationTargetException ex) {
                     thrown = ex.getCause();
                 } catch (Throwable t) {
@@ -157,7 +157,7 @@ public class CallMethod {
                 args[i][0] = builder.toString();
 
                 boolean pass = false;
-                Object expectedRet = expectedRets.get(i);
+                Object expectedRet = expectedRets.get(i - 1);
                 if (thrown == null) {
                 	pass = compare(actualRet, expectedRet);
                 }
