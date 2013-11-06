@@ -1,8 +1,10 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -172,18 +174,71 @@ public class Util {
         }
     }
 
-    public static void runLabrat(ServletContext context, String repo,
+    public static String runLabrat(ServletContext context, String repo,
                                  String problem, String level, String tempDir) {
         String repoPath = context
                           .getInitParameter("com.horstmann.codecheck.repo." + repo);
         String command = Util.getProperty(repoPath, "repo.properties",
                                           "repo.command");
-        if (command == null)
-            command = context
-                      .getInitParameter("com.horstmann.codecheck.defaultcommand");
+
+        
+        // check file extension to find out whether it's java, python, or c
+        File f = new File(tempDir);
+        String fileName = f.listFiles()[0].getName();
+        String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
+        
+        
+        // get the proper codecheck script according to the file type
+        if (command == null) {
+        	if (fileType.compareToIgnoreCase("java") == 0){
+        		command = context.getInitParameter("com.horstmann.codecheck.javacommand");
+            } else if (fileType.compareToIgnoreCase("py") == 0) {
+            	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
+            }
+        }
+        
+        
+        // move the problem file to tempDir so that docker can copy it to container (security reason)
+       
+        
+        
+        // build the codecheck script
         String script = MessageFormat.format(command, level, tempDir, repoPath
-                                             + File.separator + problem, repo + ":" + problem + ":" + level);
-        runScript(script);
+                + File.separator + problem, repo + ":" + problem + ":" + level);
+        
+        
+        // create the Dockerfile in tempDir
+        
+        
+        // create the script to run the Dockerfile
+        
+        
+        // run the Dockerfile
+        runScript(script); ////
+        String result = "";
+        try
+        {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec("");
+            p.waitFor();
+            
+            // read ouput
+            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            p.waitFor();
+            while (br.ready()) {
+                result += br.readLine() + "\n";
+            }
+        }
+        catch (Exception e)
+        {
+			System.out.println(e.getMessage());
+        }
+        
+        
+        // copy the report.html from the docker container back to host
+        
+        
+        return tempDir;
     }
 
     /**

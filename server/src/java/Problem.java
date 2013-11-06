@@ -134,7 +134,7 @@ public class Problem {
                 requiredFiles.add(findClass(cl));
         else       // TODO: Maybe always
             for (Path p : solutionFiles)
-                if (p.toString().endsWith(".java"))
+                if (p.toString().endsWith(".java") || p.toString().endsWith(".py"))
                     requiredFiles.add(find(Util.tail(p)));
 
         String editclass = getStringProperty("editclass");

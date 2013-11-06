@@ -38,7 +38,8 @@ public class Check {
             else
                 Util.write(tempDir, key, value);
         }
-        Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
+        String script = Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
+        //Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
         Path tempDirName = tempDir.getFileName();
         // Path reportBaseDir = Util.getDir(context, "reports");
         // Path reportDir = reportBaseDir.resolve(tempDirName);
@@ -49,5 +50,6 @@ public class Check {
         // TODO: Remove temp dir?
 
         return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
+        //return Response.status(200).entity(script).build();
     }
 }
