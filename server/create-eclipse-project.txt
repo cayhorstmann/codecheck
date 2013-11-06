@@ -1,0 +1,5 @@
+* Import -> General -> Existing project
+* Switch to Java EE perspective and click on Servers tab
+* Click Download Server Component -> Glassfish Tools
+* Go to Properties -> Project Facets to enable Glassfish Web Extensions -> Click on Runtimes tab -> Click on Glassfish 4.0
+* Go to Properties -> Java Build Path -> Remove current path -> Expand src -> Click on java
