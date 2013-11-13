@@ -50,6 +50,6 @@ public class Check {
         // TODO: Remove temp dir?
 
         return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
-        //return Response.status(200).entity(script).build();
+        //return Response.status(200).entity(script.replace("\n", "<br />")).build();
     }
 }

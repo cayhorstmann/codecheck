@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,6 +16,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -182,63 +184,119 @@ public class Util {
                                           "repo.command");
 
         
-        // check file extension to find out whether it's java, python, or c
+        // check file extension to invoke proper codecheck type (java, python, or c/c++) 
         File f = new File(tempDir);
         String fileName = f.listFiles()[0].getName();
-        String fileType = fileName.substring(fileName.lastIndexOf('.') + 1);
-        
-        
-        // get the proper codecheck script according to the file type
         if (command == null) {
-        	if (fileType.compareToIgnoreCase("java") == 0){
+        	
+        	// run Java
+        	if (fileName.endsWith(".java")){
         		command = context.getInitParameter("com.horstmann.codecheck.javacommand");
-            } else if (fileType.compareToIgnoreCase("py") == 0) {
+                runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
+                
+            // run Python inside docker
+                
+            /* NOTE !!!!!!!!!!!!!!!!
+             * 
+             * 
+             * 	!!!!!!!!!!!!!!!!!   Must enable swap to prevent docker from not being able to run due to low memory   	!!!!!!!!!!!!!!!!!
+             * 
+             * 
+             * 				To add 1024 MB swap to your ec2 instance you type:
+			 *
+			 *	sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+			 *	sudo /sbin/mkswap /var/swap.1
+			 *	sudo /sbin/swapon /var/swap.1
+			 *
+			 *				If you need more than 1024 then change that to something higher.
+			 *	
+			 *				To enable it by default after reboot, add this line to /etc/fstab:
+			 *	
+			 *	/var/swap.1 swap swap defaults 0 0
+			 *
+             *  
+             *  
+             *  
+             *  !!!!!!!!!!!!!!!!!   If using a password for sudo, change variable "systemPassword" accordingly 			!!!!!!!!!!!!!!!!!
+             *  If not using a password then no need to do anything
+             *  
+             *  
+             *   */
+            } else if (fileName.endsWith(".py")) {
             	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
+            	
+            	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
+                String codecheckCommitNumber = "2f0f7b9";
+                String runDockerScript = "#!/bin/bash";
+                runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
+                runDockerScript += String.format("\ncp -r %s* %sproblem", repoPath + File.separator + problem + File.separator, tempDir + File.separator);
+                
+                // create the Dockerfile in tempDir
+                String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerpythoncommand");
+                String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
+                        + File.separator + problem, repo + ":" + problem + ":" + level);
+                runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
+                runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
+                runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
+                runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
+                
+                // run the Dockerfile
+                String systemPassword = "kietkiet";
+                runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
+                
+                // remove problem folder inside tempDir
+                runDockerScript += String.format("\nrm -r %sproblem" + File.separator, tempDir + File.separator);
+                
+                try {
+        			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
+        			Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
+        			fw.write(runDockerScript);
+        			fw.close();
+        				
+        			// run the runDockerScript
+        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "runDocker");
+        			p.waitFor();
+        	        
+        		} catch (Exception e1) {
+        			e1.printStackTrace();
+        		}
+                
+                // parse the dockeroutput text file for the final docker image ID
+                String dockerOutput = read(Paths.get(tempDir + File.separator + "dockeroutput.txt"));
+                int startPos = dockerOutput.lastIndexOf("Successfully built ");
+                int endPos = dockerOutput.indexOf("\n", startPos);
+                String dockerImageID = dockerOutput.substring(endPos - 12, endPos);
+                
+                // run final image to copy the report.html and singed zip files from the docker container back to host
+                String tempDirFolder = tempDir.substring(tempDir.lastIndexOf(File.separator) + 1);
+                String copyFileScript = "#!/bin/bash";
+                copyFileScript += String.format("\nID=`echo %s | sudo -S docker run -d %s /bin/bash`", systemPassword, dockerImageID);
+                copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
+                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
+                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
+                copyFileScript += String.format("\nrm -r %s", tempDir + File.separator + tempDirFolder);
+                
+                // remove the container BEFORE image to prevent stale NFS file handle ERROR
+                copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
+                copyFileScript += String.format("\necho %s | sudo -S docker rmi %s", systemPassword, dockerImageID);
+                
+                try {
+        			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
+        			Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
+        			fw.write(copyFileScript);
+        			fw.close();
+        				
+        			// run the copyFileScript 
+        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "copyFiles");
+        			p.waitFor();
+        	        
+        		} catch (Exception e1) {
+        			e1.printStackTrace();
+        		}
             }
         }
         
-        
-        // move the problem file to tempDir so that docker can copy it to container (security reason)
-       
-        
-        
-        // build the codecheck script
-        String script = MessageFormat.format(command, level, tempDir, repoPath
-                + File.separator + problem, repo + ":" + problem + ":" + level);
-        
-        
-        // create the Dockerfile in tempDir
-        
-        
-        // create the script to run the Dockerfile
-        
-        
-        // run the Dockerfile
-        runScript(script); ////
-        String result = "";
-        try
-        {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec("");
-            p.waitFor();
-            
-            // read ouput
-            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            p.waitFor();
-            while (br.ready()) {
-                result += br.readLine() + "\n";
-            }
-        }
-        catch (Exception e)
-        {
-			System.out.println(e.getMessage());
-        }
-        
-        
-        // copy the report.html from the docker container back to host
-        
-        
-        return tempDir;
+        return "cd " + tempDir;
     }
 
     /**

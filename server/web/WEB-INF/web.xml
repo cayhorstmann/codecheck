@@ -53,12 +53,20 @@
     <param-value>/home/kn-ub64/codecheck/checker/codecheck -q {0} {1} {2} {3}</param-value>
   </context-param>    
   <context-param>
+    <param-name>com.horstmann.codecheck.defaultdockercommand</param-name>
+    <param-value>/codecheck/checker/codecheck -q {0} {1} {2} {3}</param-value>
+  </context-param>    
+  <context-param>
     <param-name>com.horstmann.codecheck.javacommand</param-name>
     <param-value>/home/kn-ub64/codecheck/checker/codecheck-java -q {0} {1} {2} {3}</param-value>
   </context-param>   
   <context-param>
     <param-name>com.horstmann.codecheck.pythoncommand</param-name>
     <param-value>/home/kn-ub64/codecheck/checker/codecheck-python -q {0} {1} {2} {3}</param-value>
+  </context-param>   
+  <context-param>
+    <param-name>com.horstmann.codecheck.dockerpythoncommand</param-name>
+    <param-value>/codecheck/checker/codecheck-python -q {0} {1} {2} {3}</param-value>
   </context-param>   
   <context-param>
     <param-name>com.horstmann.codecheck.gradecommand</param-name>

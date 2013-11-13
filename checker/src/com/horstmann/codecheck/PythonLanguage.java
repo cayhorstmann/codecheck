@@ -69,13 +69,13 @@ public class PythonLanguage implements Language {
 
 
 		String result = "";
-		System.out.println("--- call made --- python " + classpathDir + "/" + mainclass + ".py" + (args == null || args.trim().equals("") ? "" : " " + args));
+		System.out.println("--- call made --- python3 " + classpathDir + "/" + mainclass + ".py" + (args == null || args.trim().equals("") ? "" : " " + args));
 
 		try
         {
             Runtime r = Runtime.getRuntime();
 			
-            Process p = r.exec("python " + classpathDir + "/" + mainclass + ".py" + (args == null || args.trim().equals("") ? "" : " " + args));
+            Process p = r.exec("python3 " + classpathDir + "/" + mainclass + ".py" + (args == null || args.trim().equals("") ? "" : " " + args));
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             p.waitFor();
             while (br.ready()) {
@@ -86,7 +86,7 @@ public class PythonLanguage implements Language {
         catch (Exception e)
         {
 			String cause = e.getMessage();
-			if (cause.equals("python: not found"))
+			if (cause.equals("python3: not found"))
 				System.out.println("No python interpreter found.");
         }
 
