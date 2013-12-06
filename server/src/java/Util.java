@@ -226,7 +226,7 @@ public class Util {
             	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
             	
             	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
-                String codecheckCommitNumber = "2f0f7b9";
+                String codecheckCommitNumber = "";
                 String runDockerScript = "#!/bin/bash";
                 runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
                 runDockerScript += String.format("\ncp -r %s* %sproblem", repoPath + File.separator + problem + File.separator, tempDir + File.separator);
