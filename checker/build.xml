@@ -20,7 +20,7 @@
 
 -->
 
-<project name="codecheckMinh" basedir="." default="web">
+<project name="codecheck" basedir="." default="web">
 
   <property name="src.dir" value="${basedir}/src" />
   <property name="build.dir" value="${basedir}/antbuild" />
