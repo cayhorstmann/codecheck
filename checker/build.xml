@@ -20,10 +20,11 @@
 
 -->
 
-<project name="codecheck" basedir="." default="web">
+<project name="codecheckMinh" basedir="." default="web">
 
   <property name="src.dir" value="${basedir}/src" />
   <property name="build.dir" value="${basedir}/antbuild" />
+  <property name="lib.dir" value="${basedir}/lib" />
   <property name="jarfile" value="${ant.project.name}.jar" />
   <property name="runnerfile" value="run${ant.project.name}.jar" />
   <property name="app.resources" 
@@ -32,6 +33,10 @@
   <property name="webdir2" value="/home/cay/cs1java/codecheck" />
   <property name="runscript" value="codecheck" />
 
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar" />
+  </path>   
+  
   <target name="clean" description="Delete all generated files">
     <delete dir="${build.dir}" />
   </target>
@@ -52,7 +57,7 @@
  </target>
 
   <target name="compile" description="Compiles the Task" depends="init, props">
-    <javac includeantruntime="false" srcdir="${src.dir}" debug="true" destdir="${build.dir}"/>
+    <javac includeantruntime="false" srcdir="${src.dir}" debug="true" destdir="${build.dir}" classpathref="classpath"/>
     <copy todir="${build.dir}" preservelastmodified="true">
       <fileset dir="${src.dir}">
         <include name="**/*.xml" />
