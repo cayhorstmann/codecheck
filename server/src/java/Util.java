@@ -194,62 +194,67 @@ public class Util {
         		command = context.getInitParameter("com.horstmann.codecheck.javacommand");
                 runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
                 
-            // run Python inside docker
-                
-            /* NOTE !!!!!!!!!!!!!!!!
-             * 
-             * 
-             * 	!!!!!!!!!!!!!!!!!   Must enable swap to prevent docker from not being able to run due to low memory   	!!!!!!!!!!!!!!!!!
-             * 
-             * 
-             * 				To add 1024 MB swap to your ec2 instance you type:
-			 *
-			 *	sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
-			 *	sudo /sbin/mkswap /var/swap.1
-			 *	sudo /sbin/swapon /var/swap.1
-			 *
-			 *				If you need more than 1024 then change that to something higher.
-			 *	
-			 *				To enable it by default after reboot, add this line to /etc/fstab:
-			 *	
-			 *	/var/swap.1 swap swap defaults 0 0
-			 *
-             *  
-             *  
-             *  
-             *  !!!!!!!!!!!!!!!!!   If using a password for sudo, change variable "systemPassword" accordingly 			!!!!!!!!!!!!!!!!!
-             *  If not using a password then no need to do anything
-             *  
-             *  
-             *   */
             } else if (fileName.endsWith(".py")) {
+            	
+            	// run Python inside docker
+                
+                /* NOTE !!!!!!!!!!!!!!!!
+                 * 
+                 * 
+                 * 	!!!!!!!!!!!!!!!!!   Must enable swap to prevent docker from not being able to run due to low memory   	!!!!!!!!!!!!!!!!!
+                 * 
+                 * 
+                 * 				To add 1024 MB swap to your ec2 instance you type:
+    			 *
+    			 *	sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+    			 *	sudo /sbin/mkswap /var/swap.1
+    			 *	sudo /sbin/swapon /var/swap.1
+    			 *
+    			 *				If you need more than 1024 then change that to something higher.
+    			 *	
+    			 *				To enable it by default after reboot, add this line to /etc/fstab:
+    			 *	
+    			 *	/var/swap.1 swap swap defaults 0 0
+    			 *
+                 *  
+                 *  
+                 *  
+                 *  !!!!!!!!!!!!!!!!!   If using a password for sudo, change variable "systemPassword" accordingly 			!!!!!!!!!!!!!!!!!
+                 *  
+                 *  If not using a password then no need to do anything
+                 *  
+                 *  
+                 *   */
+            	
             	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
             	
             	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
-                String codecheckCommitNumber = "2f0f7b9";
+                String codecheckCommitNumber = "latest";
+                String systemPassword = "kietkiet";
                 String runDockerScript = "#!/bin/bash";
                 runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
-                runDockerScript += String.format("\ncp -r %s* %sproblem", repoPath + File.separator + problem + File.separator, tempDir + File.separator);
+                runDockerScript += String.format("\necho %s | sudo -S cp -r %s* %sproblem", systemPassword, repoPath + File.separator + problem + File.separator, tempDir + File.separator);
                 
                 // create the Dockerfile in tempDir
                 String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerpythoncommand");
                 String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
                         + File.separator + problem, repo + ":" + problem + ":" + level);
+				codecheckScript = codecheckScript.replace("\n", "");
                 runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
                 runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
                 runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
                 runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
                 
                 // run the Dockerfile
-                String systemPassword = "kietkiet";
                 runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
                 
                 // remove problem folder inside tempDir
-                runDockerScript += String.format("\nrm -r %sproblem" + File.separator, tempDir + File.separator);
+                runDockerScript += String.format("\necho %s | sudo -S rm -r %sproblem",systemPassword, tempDir + File.separator);
                 
                 try {
         			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
-        			Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
+        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
+        			p0.waitFor();
         			fw.write(runDockerScript);
         			fw.close();
         				
@@ -274,7 +279,7 @@ public class Util {
                 copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
                 copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
                 copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
-                copyFileScript += String.format("\nrm -r %s", tempDir + File.separator + tempDirFolder);
+                copyFileScript += String.format("\necho %s | sudo -S rm -r %s", systemPassword, tempDir + File.separator + tempDirFolder);
                 
                 // remove the container BEFORE image to prevent stale NFS file handle ERROR
                 copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
@@ -282,7 +287,8 @@ public class Util {
                 
                 try {
         			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
-        			Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
+        			Process p01 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
+        			p01.waitFor();
         			fw.write(copyFileScript);
         			fw.close();
         				
@@ -293,10 +299,13 @@ public class Util {
         		} catch (Exception e1) {
         			e1.printStackTrace();
         		}
+            }  else if (fileName.endsWith(".c")) {
+            	command = context.getInitParameter("com.horstmann.codecheck.ccommand");
+                runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
             }
         }
         
-        return "cd " + tempDir;
+        return MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level);
     }
 
     /**

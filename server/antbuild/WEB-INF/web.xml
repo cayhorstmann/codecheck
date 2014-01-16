@@ -65,6 +65,10 @@
     <param-value>/home/kn-ub64/codecheck/checker/codecheck-python -q {0} {1} {2} {3}</param-value>
   </context-param>   
   <context-param>
+    <param-name>com.horstmann.codecheck.ccommand</param-name>
+    <param-value>/home/kn-ub64/codecheck/checker/codecheck-c -q {0} {1} {2} {3}</param-value>
+  </context-param>   
+  <context-param>
     <param-name>com.horstmann.codecheck.dockerpythoncommand</param-name>
     <param-value>/codecheck/checker/codecheck-python -q {0} {1} {2} {3}</param-value>
   </context-param>   

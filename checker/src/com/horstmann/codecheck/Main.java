@@ -444,6 +444,8 @@ public class Main {
             }
         }
     	
+       
+        
         String mode = args[0].trim();
         Path submissionDir = FileSystems.getDefault().getPath(args[1]);
         problemDir = FileSystems.getDefault().getPath(args[2]);
