@@ -424,6 +424,11 @@ public class Main {
                 }
             	score.pass(outcomes[i]);
             }
+            for (int i = 0; i < args.length; i++){
+            	System.out.println("Main doCalls() $args[" + i + "][0] = " + args[i][0]);
+            }
+            
+            
             report.runTable(new String[] { "Arguments" }, args, actual, expected, outcomes);
         }
     }

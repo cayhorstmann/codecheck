@@ -1,7 +1,9 @@
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Random;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -48,6 +50,19 @@ public class Check {
         // TODO: Find the JAR file name and move it
         // Files.copy(tempDir.resolve("report.jar"), reportDir.resolve("report.jar"));
         // TODO: Remove temp dir?
+        
+        File f = new File(tempDir + "/report.html");
+        if(!f.exists()) {
+        	Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
+        	Logger l = Logger.getLogger("");
+        	File f2 = new File(tempDir + "/report.html");
+        	if(!f2.exists()) {
+        		l.severe("docker_still_failed -- " + tempDir);
+            	return Response.status(200).entity("Timeout").build();
+            } else {
+            	l.info("docker_recovered -- " + tempDir);
+            }
+        }
 
         return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
         //return Response.status(200).entity(script.replace("\n", "<br />")).build();

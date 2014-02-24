@@ -53,7 +53,6 @@ public class PythonLanguage implements Language {
 
 	@Override
 	public boolean compile(String modulename, Path dir, Report report) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
@@ -123,18 +122,18 @@ public class PythonLanguage implements Language {
 		}
 		lines.add(++i, "if __name__ == \"__main__\":");
 		lines.add(++i, "	main()");
-		//System.out.println(" --- className --- " + className); 
-		//System.out.println(" --- sourceDir --- " + sourceDir.toString()); 
-		//System.out.println(" --- targetDir --- " + targetDir.toString());
-		//System.out.println(" --- file --- " + file.toString());
-		//System.out.println(" --- modifiers --- " + modifiers);
-		//System.out.println(" --- name --- " + name);
-		//System.out.println(" --- argsList.get(0) --- " + argsList.get(0));
-		//System.out.println("*************************************************");
-		//for (int x = 0; x < lines.size(); x++){
-		//	System.out.println(lines.get(x));
-		//}
-		//System.out.println("*************************************************");
+//		System.out.println(" --- className --- " + className); 
+//		System.out.println(" --- sourceDir --- " + sourceDir.toString()); 
+//		System.out.println(" --- targetDir --- " + targetDir.toString());
+//		System.out.println(" --- file --- " + file.toString());
+//		System.out.println(" --- modifiers --- " + modifiers);
+//		System.out.println(" --- name --- " + name);
+//		System.out.println(" --- argsList.get(0) --- " + argsList.get(0));
+//		System.out.println("*************************************************");
+//		for (int x = 0; x < lines.size(); x++){
+//			System.out.println(lines.get(x));
+//		}
+//		System.out.println("*************************************************");
 		Files.write(targetDir.resolve(pathOf(className + "CodeCheck")), lines, StandardCharsets.UTF_8);
 	}
 
