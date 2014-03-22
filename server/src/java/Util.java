@@ -2,7 +2,6 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,7 +22,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -188,8 +186,8 @@ public class Util {
         String fileName = "";
         File[] filenames = f.listFiles();
 
-        String systemPassword = "kietkiet";
-        String codecheckCommitNumber = "latest";
+//        String systemPassword = "kietkiet";
+//        String codecheckCommitNumber = "latest";
         
         
         for (int i = 0; i < filenames.length; i++){
@@ -245,211 +243,211 @@ public class Util {
                  *  
                  *   */
             	
-//            	// non-docker stuff
-//            	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
-//              runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
+            	// non-docker stuff
+            	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
+            	runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
                 
 //              // docker stuff
-            	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
-            	
-            	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
-                
-                String runDockerScript = "#!/bin/bash";
-                runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
-                runDockerScript += String.format("\necho %s | sudo -S cp -r %s* %sproblem", systemPassword, repoPath + File.separator + problem + File.separator, tempDir + File.separator);
-                
-                // create the Dockerfile in tempDir
-                String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerpythoncommand");
-                String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
-                        + File.separator + problem, repo + ":" + problem + ":" + level);
-				codecheckScript = codecheckScript.replace("\n", "");
-                runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'RUN rm %s/Dockerfile %s/runDocker %s/dockeroutput.txt -r %s/problem' >> %sDockerfile", tempDir, tempDir, tempDir, tempDir, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
-                
-                // run the Dockerfile
-                runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
-                
-                try {
-        			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
-        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
-        			p0.waitFor();
-        			fw.write(runDockerScript);
-        			fw.close();
-        				
-        			// run the runDockerScript
-        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "runDocker");
-        			p.waitFor();
-        	        
-        		} catch (Exception e1) {
-        			e1.printStackTrace();
-        		}
-                
-                // parse the dockeroutput text file for the final docker image ID
-                String dockerOutput = read(Paths.get(tempDir + File.separator + "dockeroutput.txt"));
-                int startPos = dockerOutput.lastIndexOf("Successfully built ");
-                int endPos = dockerOutput.indexOf("\n", startPos);
-                String dockerImageID = dockerOutput.substring(endPos - 12, endPos);
-                
-                // run final image to copy the report.html and singed zip files from the docker container back to host
-                String tempDirFolder = tempDir.substring(tempDir.lastIndexOf(File.separator) + 1);
-                String copyFileScript = "#!/bin/bash";
-                copyFileScript += String.format("\nID=`echo %s | sudo -S docker run -d %s /bin/bash`", systemPassword, dockerImageID);
-                copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
-                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
-                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
-                copyFileScript += String.format("\necho %s | sudo -S rm -r %s", systemPassword, tempDir + File.separator + tempDirFolder);
-                
-                // remove problem folder inside tempDir
-                copyFileScript += String.format("\necho %s | sudo -S rm -r %sproblem",systemPassword, tempDir + File.separator);
-                
-                // remove the container BEFORE image to prevent stale NFS file handle ERROR
-                copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
-                copyFileScript += String.format("\necho %s | sudo -S docker rmi %s", systemPassword, dockerImageID);
-                
-                try {
-        			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
-        			Process p01 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
-        			p01.waitFor();
-        			fw.write(copyFileScript);
-        			fw.close();
-        			
-        			String failureMessage = "docker_has_failed -- py -- ";
-                    if (startPos == -1){
-                    	// Log docker failures here
-                    	Logger l = Logger.getLogger("");
-                        l.severe(failureMessage + tempDir);
-                    } else {
-                    	// Log docker success here
-            			String successMessage = "docker_success -- py -- ";
-                    	Logger l = Logger.getLogger("");
-                        l.info(successMessage + tempDir);
-                    }
-        				
-        			// run the copyFileScript 
-        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "copyFiles");
-        			p.waitFor();
-        			
-        			// copy docker files to /data/temp/docker
-        			Process pdockercopy = Runtime.getRuntime().exec("cp -r " + tempDir + " /data/temp/docker" );
-        			pdockercopy.waitFor();
-        			
-        			// remove docker files
-        			Process pdockerremove = Runtime.getRuntime().exec("rm " + tempDir + "/copyFiles " + tempDir + "/runDocker " + tempDir + "/dockeroutput.txt " + tempDir + "/Dockerfile");
-        			pdockerremove.waitFor();
-        			
-        			
-        		} catch (Exception e1) {
-        			e1.printStackTrace();
-        		}
+//            	command = context.getInitParameter("com.horstmann.codecheck.pythoncommand");
+//            	
+//            	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
+//                
+//                String runDockerScript = "#!/bin/bash";
+//                runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
+//                runDockerScript += String.format("\necho %s | sudo -S cp -r %s* %sproblem", systemPassword, repoPath + File.separator + problem + File.separator, tempDir + File.separator);
+//                
+//                // create the Dockerfile in tempDir
+//                String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerpythoncommand");
+//                String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
+//                        + File.separator + problem, repo + ":" + problem + ":" + level);
+//				codecheckScript = codecheckScript.replace("\n", "");
+//                runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'RUN rm %s/Dockerfile %s/runDocker %s/dockeroutput.txt -r %s/problem' >> %sDockerfile", tempDir, tempDir, tempDir, tempDir, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
+//                
+//                // run the Dockerfile
+//                runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
+//                
+//                try {
+//        			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
+//        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
+//        			p0.waitFor();
+//        			fw.write(runDockerScript);
+//        			fw.close();
+//        				
+//        			// run the runDockerScript
+//        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "runDocker");
+//        			p.waitFor();
+//        	        
+//        		} catch (Exception e1) {
+//        			e1.printStackTrace();
+//        		}
+//                
+//                // parse the dockeroutput text file for the final docker image ID
+//                String dockerOutput = read(Paths.get(tempDir + File.separator + "dockeroutput.txt"));
+//                int startPos = dockerOutput.lastIndexOf("Successfully built ");
+//                int endPos = dockerOutput.indexOf("\n", startPos);
+//                String dockerImageID = dockerOutput.substring(endPos - 12, endPos);
+//                
+//                // run final image to copy the report.html and singed zip files from the docker container back to host
+//                String tempDirFolder = tempDir.substring(tempDir.lastIndexOf(File.separator) + 1);
+//                String copyFileScript = "#!/bin/bash";
+//                copyFileScript += String.format("\nID=`echo %s | sudo -S docker run -d %s /bin/bash`", systemPassword, dockerImageID);
+//                copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
+//                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
+//                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
+//                copyFileScript += String.format("\necho %s | sudo -S rm -r %s", systemPassword, tempDir + File.separator + tempDirFolder);
+//                
+//                // remove problem folder inside tempDir
+//                copyFileScript += String.format("\necho %s | sudo -S rm -r %sproblem",systemPassword, tempDir + File.separator);
+//                
+//                // remove the container BEFORE image to prevent stale NFS file handle ERROR
+//                copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
+//                copyFileScript += String.format("\necho %s | sudo -S docker rmi %s", systemPassword, dockerImageID);
+//                
+//                try {
+//        			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
+//        			Process p01 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
+//        			p01.waitFor();
+//        			fw.write(copyFileScript);
+//        			fw.close();
+//        			
+//        			String failureMessage = "docker_has_failed -- py -- ";
+//                    if (startPos == -1){
+//                    	// Log docker failures here
+//                    	Logger l = Logger.getLogger("");
+//                        l.severe(failureMessage + tempDir);
+//                    } else {
+//                    	// Log docker success here
+//            			String successMessage = "docker_success -- py -- ";
+//                    	Logger l = Logger.getLogger("");
+//                        l.info(successMessage + tempDir);
+//                    }
+//        				
+//        			// run the copyFileScript 
+//        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "copyFiles");
+//        			p.waitFor();
+//        			
+//        			// copy docker files to /data/temp/docker
+//        			Process pdockercopy = Runtime.getRuntime().exec("cp -r " + tempDir + " /data/temp/docker" );
+//        			pdockercopy.waitFor();
+//        			
+//        			// remove docker files
+//        			Process pdockerremove = Runtime.getRuntime().exec("rm " + tempDir + "/copyFiles " + tempDir + "/runDocker " + tempDir + "/dockeroutput.txt " + tempDir + "/Dockerfile");
+//        			pdockerremove.waitFor();
+//        			
+//        			
+//        		} catch (Exception e1) {
+//        			e1.printStackTrace();
+//        		}
             }  else if (fileName.endsWith(".c")) {
             	
-//            	// non-docker stuff
-//            	command = context.getInitParameter("com.horstmann.codecheck.ccommand");
-//              runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
+            	// non-docker stuff
+            	command = context.getInitParameter("com.horstmann.codecheck.ccommand");
+            	runScript(MessageFormat.format(command, level, tempDir, repoPath + File.separator + problem, repo + ":" + problem + ":" + level));
                 
-                // docker stuff
-                command = context.getInitParameter("com.horstmann.codecheck.ccommand");
-            	
-            	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
-                String runDockerScript = "#!/bin/bash";
-                runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
-                runDockerScript += String.format("\necho %s | sudo -S cp -r %s* %sproblem", systemPassword, repoPath + File.separator + problem + File.separator, tempDir + File.separator);
-                
-                // create the Dockerfile in tempDir
-                String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerccommand");
-                String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
-                        + File.separator + problem, repo + ":" + problem + ":" + level);
-				codecheckScript = codecheckScript.replace("\n", "");
-                runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'RUN rm %s/Dockerfile %s/runDocker %s/dockeroutput.txt -r %s/problem' >> %sDockerfile", tempDir, tempDir, tempDir, tempDir, tempDir + File.separator);
-                runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
-                
-                // run the Dockerfile
-                runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
-                
-                
-                try {
-        			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
-        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
-        			p0.waitFor();
-        			fw.write(runDockerScript);
-        			fw.close();
-        				
-        			// run the runDockerScript
-        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "runDocker");
-        			p.waitFor();
-        	        
-        		} catch (Exception e1) {
-        			e1.printStackTrace();
-        		}
-                
-                // parse the dockeroutput text file for the final docker image ID
-                String dockerOutput = read(Paths.get(tempDir + File.separator + "dockeroutput.txt"));
-                int startPos = dockerOutput.lastIndexOf("Successfully built ");
-                int endPos = dockerOutput.indexOf("\n", startPos);
-                String dockerImageID = dockerOutput.substring(endPos - 12, endPos);
-                
-                
-                // run final image to copy the report.html and singed zip files from the docker container back to host
-                String tempDirFolder = tempDir.substring(tempDir.lastIndexOf(File.separator) + 1);
-                String copyFileScript = "#!/bin/bash";
-                copyFileScript += String.format("\nID=`echo %s | sudo -S docker run -d %s /bin/bash`", systemPassword, dockerImageID);
-                copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
-                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
-                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
-                copyFileScript += String.format("\necho %s | sudo -S rm -r %s", systemPassword, tempDir + File.separator + tempDirFolder);
-                
-                // remove problem folder inside tempDir
-                copyFileScript += String.format("\necho %s | sudo -S rm -r %sproblem",systemPassword, tempDir + File.separator);
-                
-                
-                // remove the container BEFORE image to prevent stale NFS file handle ERROR
-                copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
-                copyFileScript += String.format("\necho %s | sudo -S docker rmi %s", systemPassword, dockerImageID);
-                
-                
-                
-                try {
-        			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
-        			Process p01 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
-        			p01.waitFor();
-        			fw.write(copyFileScript);
-        			fw.close();
-        			
-        			String failureMessage = "docker_has_failed -- c -- ";
-                    if (startPos == -1){
-                    	// Log docker failures here
-                    	Logger l = Logger.getLogger("");
-                        l.severe(failureMessage + tempDir);
-                    } else {
-                    	// Log docker success here
-            			String successMessage = "docker_success -- c -- ";
-                    	Logger l = Logger.getLogger("");
-                        l.info(successMessage + tempDir);
-                    }
-        				
-        			// run the copyFileScript 
-        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "copyFiles");
-        			p.waitFor();
-        			
-        			// copy docker files to /data/temp/docker
-        			Process pdockercopy = Runtime.getRuntime().exec("cp -r " + tempDir + " /data/temp/docker" );
-        			pdockercopy.waitFor();
-        			
-        			// remove docker files
-        			Process pdockerremove = Runtime.getRuntime().exec("rm " + tempDir + "/copyFiles " + tempDir + "/runDocker " + tempDir + "/dockeroutput.txt " + tempDir + "/Dockerfile");
-        			pdockerremove.waitFor();
-        			
-        			
-        	        
-        		} catch (Exception e1) {
-        			e1.printStackTrace();
-        		}
+//                // docker stuff
+//                command = context.getInitParameter("com.horstmann.codecheck.ccommand");
+//            	
+//            	// move the problem file to tempDir so that docker can copy it to container (docker's security reason)
+//                String runDockerScript = "#!/bin/bash";
+//                runDockerScript += String.format("\nmkdir %sproblem", tempDir + File.separator);
+//                runDockerScript += String.format("\necho %s | sudo -S cp -r %s* %sproblem", systemPassword, repoPath + File.separator + problem + File.separator, tempDir + File.separator);
+//                
+//                // create the Dockerfile in tempDir
+//                String dockercommand = context.getInitParameter("com.horstmann.codecheck.dockerccommand");
+//                String codecheckScript = MessageFormat.format(dockercommand, level, tempDir, repoPath
+//                        + File.separator + problem, repo + ":" + problem + ":" + level);
+//				codecheckScript = codecheckScript.replace("\n", "");
+//                runDockerScript += String.format("\necho 'FROM codecheck/cc-%s' >> %sDockerfile", codecheckCommitNumber, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'ADD ./ %s' >> %sDockerfile", tempDir, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'ADD ./problem %s' >> %sDockerfile", repoPath + File.separator + problem, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'RUN rm %s/Dockerfile %s/runDocker %s/dockeroutput.txt -r %s/problem' >> %sDockerfile", tempDir, tempDir, tempDir, tempDir, tempDir + File.separator);
+//                runDockerScript += String.format("\necho 'RUN %s' >> %sDockerfile", codecheckScript, tempDir + File.separator);
+//                
+//                // run the Dockerfile
+//                runDockerScript += String.format("\necho %s | sudo -S docker build -rm %s > %sdockeroutput.txt", systemPassword, tempDir,  tempDir + File.separator);
+//                
+//                
+//                try {
+//        			FileWriter fw = new FileWriter(String.format("%s/runDocker", tempDir),true);
+//        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/runDocker", tempDir));
+//        			p0.waitFor();
+//        			fw.write(runDockerScript);
+//        			fw.close();
+//        				
+//        			// run the runDockerScript
+//        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "runDocker");
+//        			p.waitFor();
+//        	        
+//        		} catch (Exception e1) {
+//        			e1.printStackTrace();
+//        		}
+//                
+//                // parse the dockeroutput text file for the final docker image ID
+//                String dockerOutput = read(Paths.get(tempDir + File.separator + "dockeroutput.txt"));
+//                int startPos = dockerOutput.lastIndexOf("Successfully built ");
+//                int endPos = dockerOutput.indexOf("\n", startPos);
+//                String dockerImageID = dockerOutput.substring(endPos - 12, endPos);
+//                
+//                
+//                // run final image to copy the report.html and singed zip files from the docker container back to host
+//                String tempDirFolder = tempDir.substring(tempDir.lastIndexOf(File.separator) + 1);
+//                String copyFileScript = "#!/bin/bash";
+//                copyFileScript += String.format("\nID=`echo %s | sudo -S docker run -d %s /bin/bash`", systemPassword, dockerImageID);
+//                copyFileScript += String.format("\necho %s | sudo -S docker cp $ID:%s %s", systemPassword, tempDir, tempDir);
+//                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.html", tempDir);
+//                copyFileScript += String.format("\nmv %s %s", tempDir + File.separator + tempDirFolder + File.separator + "*.signed.zip", tempDir);
+//                copyFileScript += String.format("\necho %s | sudo -S rm -r %s", systemPassword, tempDir + File.separator + tempDirFolder);
+//                
+//                // remove problem folder inside tempDir
+//                copyFileScript += String.format("\necho %s | sudo -S rm -r %sproblem",systemPassword, tempDir + File.separator);
+//                
+//                
+//                // remove the container BEFORE image to prevent stale NFS file handle ERROR
+//                copyFileScript += String.format("\necho %s | sudo -S docker rm $ID", systemPassword);
+//                copyFileScript += String.format("\necho %s | sudo -S docker rmi %s", systemPassword, dockerImageID);
+//                
+//                
+//                
+//                try {
+//        			FileWriter fw = new FileWriter(String.format("%s/copyFiles", tempDir),true);
+//        			Process p01 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/copyFiles", tempDir));
+//        			p01.waitFor();
+//        			fw.write(copyFileScript);
+//        			fw.close();
+//        			
+//        			String failureMessage = "docker_has_failed -- c -- ";
+//                    if (startPos == -1){
+//                    	// Log docker failures here
+//                    	Logger l = Logger.getLogger("");
+//                        l.severe(failureMessage + tempDir);
+//                    } else {
+//                    	// Log docker success here
+//            			String successMessage = "docker_success -- c -- ";
+//                    	Logger l = Logger.getLogger("");
+//                        l.info(successMessage + tempDir);
+//                    }
+//        				
+//        			// run the copyFileScript 
+//        			Process p = Runtime.getRuntime().exec(tempDir + File.separator + "copyFiles");
+//        			p.waitFor();
+//        			
+//        			// copy docker files to /data/temp/docker
+//        			Process pdockercopy = Runtime.getRuntime().exec("cp -r " + tempDir + " /data/temp/docker" );
+//        			pdockercopy.waitFor();
+//        			
+//        			// remove docker files
+//        			Process pdockerremove = Runtime.getRuntime().exec("rm " + tempDir + "/copyFiles " + tempDir + "/runDocker " + tempDir + "/dockeroutput.txt " + tempDir + "/Dockerfile");
+//        			pdockerremove.waitFor();
+//        			
+//        			
+//        	        
+//        		} catch (Exception e1) {
+//        			e1.printStackTrace();
+//        		}
             }
         }
         

@@ -114,7 +114,7 @@ public class CLanguage implements Language {
             	Process p;
             	
             	if (input != null){
-            		execCommand = classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args  + " 2>&1");
+            		execCommand = "/home/kn-ub64/codecheck/checker/runC.sh " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args  + " 2>&1");
                 	System.out.println("CLanguage run() $execCommand = " + execCommand);
                 	p = r.exec(execCommand);
                 	p.getOutputStream();
@@ -123,7 +123,7 @@ public class CLanguage implements Language {
         			p.waitFor();
             	}
             	else {
-            		execCommand = classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args) + " 2>&1";
+            		execCommand = "/home/kn-ub64/codecheck/checker/runC.sh " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args) + " 2>&1";
             		System.out.println("CLanguage run() $execCommand = " + execCommand);
             		p = r.exec(execCommand);
             		p.waitFor();
