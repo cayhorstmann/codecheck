@@ -1,0 +1,7 @@
+jar cmf manifest.txt CodecheckExtension.jar *.class
+
+cp CodecheckExtension.jar ~/BlueJ/lib/extensions/
+
+~/BlueJ/bluej 
+
+
