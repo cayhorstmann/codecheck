@@ -1,5 +1,3 @@
-import java.io.File;
-
 import bluej.extensions.BlueJ;
 
 

@@ -335,9 +335,10 @@ public class Main {
     
     @SuppressWarnings("deprecation")
 	public void callCheckStyle(Path folder) throws FileNotFoundException {
-    	report.header("CheckStyle report: ");
-    	
     	try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
+    		System.out.println(folder.toString());
+    		
+    		report.header("CheckStyle report: ");
     		for (Path file : stream) {
     			if (file.getFileName().toString().endsWith("java")) {
         			runCheckStyle(file.toString());

@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 
 public class Connection {
 
-	private final static int URL_DIALOG_HEIGHT = 70;
+	private final static int URL_DIALOG_HEIGHT = 120;
     private final static int URL_DIALOG_WIDTH = 720;
     
     private JTextField urlField = new JTextField(60);
@@ -65,8 +65,8 @@ public class Connection {
             "Get Problem from URL", true);
 
         // set properties
-        urlDialog.setSize(URL_DIALOG_WIDTH, URL_DIALOG_HEIGHT);
-        urlDialog.setResizable(false);
+        //urlDialog.setSize(URL_DIALOG_WIDTH, URL_DIALOG_HEIGHT);
+        urlDialog.setResizable(true);
 
         // create container for widgets
         Container container = urlDialog.getContentPane();
@@ -108,6 +108,7 @@ public class Connection {
 
         // add to bottom of container and set visible
         container.add(buttonPanel, BorderLayout.SOUTH);
+        urlDialog.pack();
         urlDialog.setLocation(100, 100);
         urlDialog.setVisible(true);
     }
