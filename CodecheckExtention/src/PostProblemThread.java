@@ -13,35 +13,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import bluej.extensions.BlueJ;
 
 
 public class PostProblemThread implements Runnable {
 
 	private File projectDir;
-    private BlueJ bluej;
-    private ConfigInfo extCfg;
     
     public PostProblemThread(File projectDir) {
         this.projectDir = projectDir;
-        
-        ExtensionInformation extNfo = ExtensionInformation.getInstance();
-       
-        try { 
-            bluej = extNfo.getBlueJ();
-            extCfg = extNfo.getConfig();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
     }
     
 	@Override
 	public void run() {
-		String urlString = "http://cs12.cs.sjsu.edu:8080/codecheck/check";
+		String urlString = ""; //"http://cs12.cs.sjsu.edu:8080/codecheck/check";
 		// TODO Auto-generated method stub
 		try {
 			BufferedReader in = new BufferedReader(
@@ -50,25 +38,32 @@ public class PostProblemThread implements Runnable {
 			String repoValue = in.readLine();
 			String problemValue = in.readLine();
 			String levelValue = in.readLine();
-			String submitFileName = in.readLine();
+			urlString = in.readLine();
+			urlString = urlString.substring(0, urlString.indexOf("/file")) + "/check";
 			
+			int len = Integer.parseInt(in.readLine());
+			ArrayList<String> submitFileList = new ArrayList<String>();
+			for (int i = 0; i < len; i++)
+				submitFileList.add(in.readLine());
 			in.close();
-			in = new BufferedReader(
-					new InputStreamReader(new FileInputStream(projectDir.getPath() + "/" + submitFileName), "UTF-8"));
-			
-			String problemContent = "";
-			String line = "";
-			while ((line = in.readLine()) != null) {
-				problemContent += line + "\n";
-			}
-			in.close();
-			
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			params.put("repo", repoValue);
 			params.put("problem", problemValue);
 			params.put("level", levelValue);
-			params.put(submitFileName, problemContent);
+			
+			for (String submitFileName : submitFileList) {
+				in = new BufferedReader(
+						new InputStreamReader(new FileInputStream(projectDir.getPath() + "/" + submitFileName), "UTF-8"));
+				String problemContent = "";
+				String line = "";
+				while ((line = in.readLine()) != null) {
+					problemContent += line + "\n";
+				}
+				in.close();
+				
+				params.put(submitFileName, problemContent);
+			}
 			
 			String result = doPost(urlString, params);
 			

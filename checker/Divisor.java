@@ -1,18 +1,19 @@
 
-public class Divisor {
+public class Divisor 
+{
 
 	/**
-	 * @param args
+	 * @param args - From SUBMISSION folder
 	 */
-	 /*
-	public static void main(String[] args) {
-		int n = 28;
-		System.out.println(numberOfDivisors(n));
-	}
-    */
-	public static int numberOfDivisors(int n) {
-	
-		//need to be done
-		return 0;
+
+	public static int numberOfDivisors(int n) 
+	{
+		int count = 25;	
+		/*
+		while (count != 0) {
+            count--;
+		}
+		*/
+		return count;
 	}
 }

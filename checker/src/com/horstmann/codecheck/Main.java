@@ -42,8 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
+import org.junit.runner.JUnitCore;
 
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
@@ -730,11 +729,18 @@ public class Main {
     	System.out.println("JUnit test case: " + jUnitFile);
     	System.setSecurityManager(securityManager);
     	
+    	
+    	
 		URL classUrl = new URL("file://" + dir.toString() + "/");  
     	URL[] classUrls = { classUrl };
     	URLClassLoader ucl = new URLClassLoader(classUrls);
     	Class c = ucl.loadClass(classname); 
     	
+    	JUnitCore runner = new JUnitCore();
+    	runner.addListener(new JUnitListener());
+    	runner.run(c);
+    	
+    	/*
 		Result r = org.junit.runner.JUnitCore.runClasses(c);
 		
 		if (r.getFailureCount() > 0) {
@@ -749,7 +755,7 @@ public class Main {
     		score.pass(true);
     	for (int i = 0; i < r.getFailureCount(); i++)
     		score.pass(false);
-    	
+    	*/
     	System.out.println("Done JUnit");
     }
     

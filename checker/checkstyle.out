@@ -4,6 +4,5 @@ Starting audit...
 /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:9: Expected an @return tag.
 /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:9:44: Expected @param tag for 'n'.
 /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:11:21: '25' is a magic number.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:12:28: '{' should be on a new line.
 Audit done.
 com.horstmann.codecheck.StudentSecurityManager$ExitException
