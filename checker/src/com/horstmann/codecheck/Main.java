@@ -43,6 +43,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
@@ -70,6 +71,8 @@ public class Main {
     private SecurityManager securityManager = new StudentSecurityManager();
     private Score score = new Score();
     private Comparison comp = new Comparison();
+    private String checkStyleFile = "";
+    private String jUnitFile = "";
 
     /**
      * Entry point to program.
@@ -303,17 +306,36 @@ public class Main {
     }
 
     private void runCheckStyle(final String javaFile) throws FileNotFoundException {
+    	System.out.println("runCheckStyle");
+    	System.out.println(checkStyleFile);
+    	System.out.println(javaFile);
+    	
     	PrintStream oldOut = System.out;
         System.setOut(new PrintStream(new FileOutputStream("checkstyle.out")));
     	System.setSecurityManager(securityManager);
     	
+    	try {
+	    	String[] args = new String[3];
+			args[0] = "-c";
+			args[1] = checkStyleFile; //CheckStyle file
+			args[2] = javaFile; //Java file will be checked
+			com.puppycrawl.tools.checkstyle.Main.main(args);
+    	} catch (Exception e) {
+    		System.out.println(e.toString());
+    	} finally {
+    		System.setOut(oldOut);
+    		System.setSecurityManager(null);
+    	}
+    	
+		/*
+    	final String checkFile = "/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/sjsu.xml";
     	try {
     		final Thread mainmethodThread = new Thread() {
                 public void run() {
         	    	try {
         	    		String[] args = new String[3];
         	    		args[0] = "-c";
-        	    		args[1] = "sjsu.xml"; //CheckStyle file
+        	    		args[1] = checkFile; //CheckStyle file
         	    		args[2] = javaFile; //Java file will be checked
         	    		com.puppycrawl.tools.checkstyle.Main.main(args);
         	    	} catch (Exception e) {
@@ -331,12 +353,13 @@ public class Main {
     		System.setOut(oldOut);
     		System.setSecurityManager(null);
     	}
+    	*/
     }
     
     @SuppressWarnings("deprecation")
 	public void callCheckStyle(Path folder) throws FileNotFoundException {
     	try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
-    		System.out.println(folder.toString());
+    		//System.out.println(folder.toString());
     		
     		report.header("CheckStyle report: ");
     		for (Path file : stream) {
@@ -355,6 +378,24 @@ public class Main {
     	} catch (IOException | DirectoryIteratorException e) {
     		System.out.println(e);
     	}
+    }
+    
+    private boolean existedCheckStyle(Path folder) { //problemDir
+    	try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
+    		System.out.println(folder.toString());
+    		
+    		for (Path file : stream) {
+    			if (file.getFileName().toString().endsWith("xml")) {
+        			checkStyleFile = file.toString();
+        			System.out.println("CheckStyle file: " + checkStyleFile);
+        			return true;
+        		}
+    		}    		
+    	} catch (IOException | DirectoryIteratorException e) {
+    		System.out.println(e);
+    	}
+    	
+    	return false;
     }
     
     boolean getBooleanProperty(String key, boolean defaultValue) {
@@ -496,7 +537,7 @@ public class Main {
             	String title = "Program run";
             	if (test != null) title = (title + " " + test.replace("test", "")).trim(); 
                 if (annotations.isSample(mainclass) || "true".equals(getStringProperty("test.run"))) { // Run without testing
-                    report.output(title, outerr);
+                    report.output(title, outerr);                	
                 }
                 else {
                     // Make output from solution
@@ -531,7 +572,7 @@ public class Main {
                         score.pass(outcome, report);
                     }
                 }
-        }
+            }
         }
     }
 
@@ -655,14 +696,23 @@ public class Main {
     	return false;
     }
     
-    String jUnitFile = "";
-    
     private int compileJUnit(String classname, Path dir) {
+    	System.out.println("compileJUnit");
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         OutputStream outStream = null; //new ByteArrayOutputStream();
         OutputStream errStream = null; //new ByteArrayOutputStream();
-        System.out.println(Util.javaPath(classname));
-        int result = compiler.run(null, null, null, "-cp", ".:/home/minhminh/JUnit/junit.jar",
+        
+        String jUnitPath = "";
+        for (URL url : ((URLClassLoader) getClass().getClassLoader()).getURLs()) {
+        	   String urlString = url.toString();
+        	   if (urlString.endsWith("junit.jar")) {
+        	      jUnitPath = urlString.substring(urlString.indexOf('/'),
+        	         urlString.lastIndexOf('/'));
+        	      break;
+        	   }
+        	}
+        
+        int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
         if (result != 0) {
             String errorReport = errStream.toString();
@@ -676,17 +726,24 @@ public class Main {
     }
     
     private void runJUnit(String classname, Path dir) throws IOException, ClassNotFoundException {
+    	System.out.println("runJUnit");
     	System.out.println("JUnit test case: " + jUnitFile);
     	System.setSecurityManager(securityManager);
     	
-		URL classUrl = new URL("file://" + dir.toString() + "/"); 
-				//new URL("file:///home/minhminh/workspace/codecheck_good/"); 
+		URL classUrl = new URL("file://" + dir.toString() + "/");  
     	URL[] classUrls = { classUrl };
     	URLClassLoader ucl = new URLClassLoader(classUrls);
     	Class c = ucl.loadClass(classname); 
     	
 		Result r = org.junit.runner.JUnitCore.runClasses(c);
-    	
+		
+		if (r.getFailureCount() > 0) {
+			report.header("Failure");
+			for (Failure failure : r.getFailures()) {
+	    		report.output(failure.toString());    		
+	    	}
+		}
+		
     	System.out.println("Test score: " + (r.getRunCount() - r.getFailureCount()) + "/" + r.getRunCount());
     	for (int i = 0; i < r.getRunCount()- r.getFailureCount(); i++)
     		score.pass(true);
@@ -699,7 +756,6 @@ public class Main {
     public void run(String[] args) throws IOException, ReflectiveOperationException {
         // TODO: Adjustable Timeouts
 
-//    	callCheckStyle();
 //        System.out.println("API called succesfully");
     	// TODO: What if args[0], args[1] don't exist?
     	
@@ -907,14 +963,19 @@ public class Main {
 	            }
 	
 	            printFiles = filterNot(printFiles, "test*.in", "test*.out", "*.expected", "check.properties", "*.png",
-	                                   "*.gif", "*.jpg", "*.jpeg", ".DS_Store");
+	                                   "*.gif", "*.jpg", "*.jpeg", ".DS_Store", "*~");
 	            if (printFiles.size() > 0) {
 	                report.header("Other files");
 	                for (Path file : printFiles)
-	                    report.file(workDir, file);
+	                	report.file(workDir, file);
 	            }
 	            
-	            callCheckStyle(submissionDir);
+	            if (existedCheckStyle(problemDir)) {
+	            	System.out.println();
+	            	System.out.println("CheckStyle running ... ");
+	            	
+	            	callCheckStyle(submissionDir);
+	            }
             }
         } catch (Throwable t) {
             report.systemError(t);
