@@ -27,7 +27,7 @@ public class RetrieveProblemThread implements Runnable {
     public RetrieveProblemThread(File projectDir, String urlString) {
         this.projectDir = projectDir;
         this.urlString = urlString;
-        
+
         ExtensionInformation extNfo = ExtensionInformation.getInstance();
        
         try { 
@@ -36,7 +36,6 @@ public class RetrieveProblemThread implements Runnable {
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
-        
     }
     
 	@Override
@@ -87,13 +86,15 @@ public class RetrieveProblemThread implements Runnable {
 			
 			startIndex = t.indexOf("<textarea name=");
 			s = t.substring(startIndex);
-			while (startIndex > -1) {
+			while (startIndex > -1) { //startIndex == 0
+				startIndex = s.indexOf("<textarea name=");
 				endIndex = s.indexOf(" rows=");
 				String submitFileName = s.substring("<textarea name=".length() + 1, endIndex - 1);
-				startIndex = s.indexOf("public class ");
-				endIndex = s.indexOf("</textarea>");
+				//startIndex = s.indexOf("public class ");
+				startIndex = s.indexOf("\">", startIndex) + 2;
+				endIndex = s.indexOf("</textarea>", startIndex);
 				String submitFileContent = "";
-				if (startIndex > -1 && endIndex > -1) 
+				if (startIndex > -1 && endIndex > -1 && startIndex != endIndex) 
 					submitFileContent = s.substring(startIndex, endIndex - 1);
 				createFile(submitFileName, submitFileContent);
 				submitFileList.add(submitFileName);
@@ -133,7 +134,6 @@ public class RetrieveProblemThread implements Runnable {
 				out.println(file);
 			out.close();
 
-			
 			try {
 				bluej.getCurrentPackage().reload();
 			} catch (ProjectNotOpenException e) {
@@ -143,7 +143,6 @@ public class RetrieveProblemThread implements Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
