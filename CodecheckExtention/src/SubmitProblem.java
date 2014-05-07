@@ -43,8 +43,12 @@ public class SubmitProblem extends AbstractAction {
 		try { 
             BPackage currentPackage = bluej.getCurrentPackage();
             if (currentPackage != null) {
+            	PostProblemFrame frame = new PostProblemFrame(currentPackage.getDir());
+            	frame.setVisible(true);
+            	/*
             	Thread actionThread = new Thread(new PostProblemThread(currentPackage.getDir()));
                 actionThread.start();
+                */
             } else {
                 NotificationWindow.display("No Current Package!", "Error");
             }

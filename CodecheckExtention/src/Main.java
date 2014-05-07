@@ -9,6 +9,7 @@ public class Main {
 		//String urlString = "http://cs12.cs.sjsu.edu:8080/codecheck/files?repo=bj4cc&problem=ch06/c06_exp_6_105";
 		File dir = new File("/home/minhminh/eclipse_plugins/CodecheckExtention");
 		
+		/*
 		boolean testGet = false;
 		if (testGet) {
 			RetrieveProblemThread get = new RetrieveProblemThread(dir, urlString);
@@ -17,6 +18,10 @@ public class Main {
 			PostProblemThread post = new PostProblemThread(dir);
 			post.run();
 		}
+		*/
+		
+		PostProblemFrame frame = new PostProblemFrame(dir);
+		frame.setVisible(true);
 	}
 
 }

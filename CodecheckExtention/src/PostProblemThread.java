@@ -29,6 +29,7 @@ public class PostProblemThread implements Runnable {
     
 	@Override
 	public void run() {
+		String urlServer = "";
 		String urlString = ""; //"http://cs12.cs.sjsu.edu:8080/codecheck/check";
 		// TODO Auto-generated method stub
 		try {
@@ -39,7 +40,8 @@ public class PostProblemThread implements Runnable {
 			String problemValue = in.readLine();
 			String levelValue = in.readLine();
 			urlString = in.readLine();
-			urlString = urlString.substring(0, urlString.indexOf("/file")) + "/check";
+			urlServer = urlString.substring(0, urlString.indexOf("/file"));
+			urlString = urlServer + "/check";
 			
 			int len = Integer.parseInt(in.readLine());
 			ArrayList<String> submitFileList = new ArrayList<String>();
@@ -66,6 +68,18 @@ public class PostProblemThread implements Runnable {
 			}
 			
 			String result = doPost(urlString, params);
+			
+			//replace download url
+			int startIndex = result.indexOf("meta name=\"Submission\" content=\"");
+			int endIndex = result.indexOf("\"/>", startIndex);
+			String submissionValue = result.substring(startIndex + "meta name=\"Submission\" content=\"".length(), endIndex);
+			
+			String urlDownload = urlServer + "/fetch/" + submissionValue + "/"; 
+			startIndex = result.indexOf("a href=\"");
+			endIndex = result.indexOf("\">Download", startIndex);
+			String signStr = result.substring(startIndex + "a href=\"".length(), endIndex);
+			urlDownload += signStr;
+			result = result.replaceAll(signStr, urlDownload);
 			
 			PrintWriter out = new PrintWriter(
 					new FileWriter(projectDir.getPath() + "/result.html"));
