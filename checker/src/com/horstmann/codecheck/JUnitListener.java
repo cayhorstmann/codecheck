@@ -1,31 +1,38 @@
 package com.horstmann.codecheck;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
 public class JUnitListener extends RunListener {
-	
-	public void testRunStarted(Description description) {
-		System.out.println("Test run started: ");
-		System.out.println(description.testCount());
+	List<String> methods;
+	List<String> outcomes;
+	List<String> reasons;
+
+	public JUnitListener(List<String> methods, List<String> outcomes, List<String> reasons) {
+		this.methods = methods;
+		this.outcomes = outcomes;
+		this.reasons = reasons;
 	}
 	
 	public void testStarted(Description description)
 	{
-		System.out.println("Starting test: " + description.getMethodName());
-		//System.out.println(description.());
+		methods.add(description.getMethodName());
+		outcomes.add("Pass");
+		reasons.add("");
 	}
 	
 	public void testFailure(Failure failure) 
 	{
-		System.out.println("Execution of test case failed : "+ failure.getMessage());
-	}
-	
-	public void testRunFinished(Result result) throws java.lang.Exception
-	{
-		System.out.println(result.getFailureCount());
-		System.out.println("Number of testcases executed : " + result.getRunCount());
+		int index = methods.size() - 1;
+		outcomes.remove(index);
+		outcomes.add("Fail");
+		reasons.remove(index);
+		reasons.add(failure.getMessage());
 	}
 }

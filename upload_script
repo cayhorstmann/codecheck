@@ -1,0 +1,10 @@
+HOST=minh@cs35.cs.sjsu.edu
+DOMAIN=/glassfish4/glassfish/domains/domain1
+CODECHECK_HOME=/codecheck
+
+cd ../checker
+ant clean
+ant
+rsync -e "ssh -p 62222" codecheck.jar lib/* minh@cs35.cs.sjsu.edu:codecheck/checker
+
+rsync -e "ssh -p 62222" codecheck.jar lib $HOST:$CODECHECK_HOME

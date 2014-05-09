@@ -428,4 +428,25 @@ public class HTMLReport implements Report {
 		builder.append(" -->\n");
 		return this;
 	}
+
+	@Override
+	public HTMLReport addTable(String[] colNames, String[][] rowData) {
+		// TODO Auto-generated method stub
+		tableStart().rowStart();
+		for (String n : colNames) headerCell(n);
+		rowEnd();
+		for (int i = 0; i < rowData.length; i++) {
+			rowStart();
+			for (String a : rowData[i]) 
+				if (a.equals("Pass") || a.equals("Fail")) {
+					cellStart();
+					pass(a.equals("Pass"));
+					cellEnd();
+				} else 
+					cell(a);
+			rowEnd();
+		}
+		tableEnd();
+		return this;
+	}
 }

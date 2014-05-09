@@ -5,17 +5,18 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
+//@RunWith(CodeCheckRunner.class)
 public class JUnitDivisorTest {
     
     Divisor divisor;
     
-	@Test(timeout = 100)
+    //@Point()
+	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        
     } 	
     
-    @Test(timeout = 100)
+    @Test(timeout = 100) 
     public void test2() {
         assertEquals("Test 2, n = 100", 9, Divisor.numberOfDivisors(100));        
     }

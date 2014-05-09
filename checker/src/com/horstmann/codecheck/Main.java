@@ -43,6 +43,8 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
@@ -304,10 +306,10 @@ public class Main {
         return result;
     }
 
-    private void runCheckStyle(final String javaFile) throws FileNotFoundException {
+    private void runCheckStyle(String javaFile) throws FileNotFoundException {
     	System.out.println("runCheckStyle");
-    	System.out.println(checkStyleFile);
-    	System.out.println(javaFile);
+    	//System.out.println(checkStyleFile);
+    	//System.out.println(javaFile);
     	
     	PrintStream oldOut = System.out;
         System.setOut(new PrintStream(new FileOutputStream("checkstyle.out")));
@@ -325,34 +327,6 @@ public class Main {
     		System.setOut(oldOut);
     		System.setSecurityManager(null);
     	}
-    	
-		/*
-    	final String checkFile = "/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/sjsu.xml";
-    	try {
-    		final Thread mainmethodThread = new Thread() {
-                public void run() {
-        	    	try {
-        	    		String[] args = new String[3];
-        	    		args[0] = "-c";
-        	    		args[1] = checkFile; //CheckStyle file
-        	    		args[2] = javaFile; //Java file will be checked
-        	    		com.puppycrawl.tools.checkstyle.Main.main(args);
-        	    	} catch (Exception e) {
-        	    		System.out.println(e.toString());
-        	    	}
-                }
-    		};
-    		mainmethodThread.start();
-    		
-    		try {
-                mainmethodThread.join();
-            } catch (InterruptedException e) {
-            }
-    	} finally {
-    		System.setOut(oldOut);
-    		System.setSecurityManager(null);
-    	}
-    	*/
     }
     
     @SuppressWarnings("deprecation")
@@ -381,7 +355,7 @@ public class Main {
     
     private boolean existedCheckStyle(Path folder) { //problemDir
     	try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
-    		System.out.println(folder.toString());
+    		//System.out.println(folder.toString());
     		
     		for (Path file : stream) {
     			if (file.getFileName().toString().endsWith("xml")) {
@@ -703,13 +677,13 @@ public class Main {
         
         String jUnitPath = "";
         for (URL url : ((URLClassLoader) getClass().getClassLoader()).getURLs()) {
-        	   String urlString = url.toString();
-        	   if (urlString.endsWith("junit.jar")) {
-        	      jUnitPath = urlString.substring(urlString.indexOf('/'),
-        	         urlString.lastIndexOf('/'));
-        	      break;
-        	   }
+        	String urlString = url.toString();
+        	if (urlString.endsWith("junit.jar")) {
+        		jUnitPath = urlString.substring(urlString.indexOf('/'),
+        		urlString.lastIndexOf('/'));
+        		break;
         	}
+        }
         
         int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
@@ -729,33 +703,37 @@ public class Main {
     	System.out.println("JUnit test case: " + jUnitFile);
     	System.setSecurityManager(securityManager);
     	
-    	
-    	
 		URL classUrl = new URL("file://" + dir.toString() + "/");  
     	URL[] classUrls = { classUrl };
     	URLClassLoader ucl = new URLClassLoader(classUrls);
     	Class c = ucl.loadClass(classname); 
     	
+    	List<String> methods = new ArrayList<String>();
+    	List<String> outcomes = new ArrayList<String>();
+    	List<String> reasons = new ArrayList<String>();
     	JUnitCore runner = new JUnitCore();
-    	runner.addListener(new JUnitListener());
-    	runner.run(c);
+    	JUnitListener listener = new JUnitListener(methods, outcomes, reasons); 
+    	runner.addListener(listener);
+    	Result r = runner.run(c);
     	
-    	/*
-		Result r = org.junit.runner.JUnitCore.runClasses(c);
-		
-		if (r.getFailureCount() > 0) {
-			report.header("Failure");
-			for (Failure failure : r.getFailures()) {
-	    		report.output(failure.toString());    		
-	    	}
-		}
-		
+    	//Print to report   	
+    	String[] colNames = new String[]{"Method", "Outcome", "Reason"};
+    	String[][] rowData = new String[methods.size()][colNames.length];
+    	for (int i = 0; i < methods.size(); i++) {
+    		rowData[i][0] = methods.get(i);
+    		rowData[i][1] = outcomes.get(i);
+    		rowData[i][2] = reasons.get(i);
+    	}
+    	report.header("Result");
+    	report.addTable(colNames, rowData);
+    	
+    	
     	System.out.println("Test score: " + (r.getRunCount() - r.getFailureCount()) + "/" + r.getRunCount());
     	for (int i = 0; i < r.getRunCount()- r.getFailureCount(); i++)
     		score.pass(true);
     	for (int i = 0; i < r.getFailureCount(); i++)
     		score.pass(false);
-    	*/
+    	
     	System.out.println("Done JUnit");
     }
     

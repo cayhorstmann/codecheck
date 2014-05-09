@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>Report</title></head><body>
 <!-- UID: JUnitDivisorProblem -->
 <!-- Level: 1 -->
-<!-- Time: 2014-05-06T03:06:36Z -->
+<!-- Time: 2014-05-09T18:09:02Z -->
+<p><b>Result</b></p>
+<table style="font-size: 0.9em;">
+<tr><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Method</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Outcome</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Reason</th></tr>
+<tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test1</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: green">pass</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">&nbsp;</td>
+</tr>
+<tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test2</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">Test 2, n = 100 expected:&lt;9&gt; but was:&lt;25&gt;</td>
+</tr>
+<tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test3</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">Test 3, n = 1283 expected:&lt;16&gt; but was:&lt;25&gt;</td>
+</tr>
+</table>
 <p><b>Student files</b></p>
 <p>Divisor.java:</p><table><tr><td style="padding-right: 1em;"><pre><span style="color: gray;">  1</span>
 <span style="color: gray;">  2</span>
@@ -69,6 +85,7 @@ public class Divisor
 <span style="color: gray;"> 25</span>
 <span style="color: gray;"> 26</span>
 <span style="color: gray;"> 27</span>
+<span style="color: gray;"> 28</span>
 </pre></td><td><pre>import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -76,17 +93,18 @@ import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-@RunWith(JUnit4.class)
+//@RunWith(CodeCheckRunner.class)
 public class JUnitDivisorTest {
     
     Divisor divisor;
     
-	@Test(timeout = 100)
+    //@Point()
+	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        
     } 	
     
-    @Test(timeout = 100)
+    @Test(timeout = 100) 
     public void test2() {
         assertEquals("Test 2, n = 100", 9, Divisor.numberOfDivisors(100));        
     }
@@ -97,5 +115,5 @@ public class JUnitDivisorTest {
     }
 }
 </pre></td></tr></table><p><b>CheckStyle report: </b></p>
-<p>2: Missing a Javadoc comment.:</p><p>6:8: Unused @param tag for 'args'.:</p><p>9: Expected an @return tag.:</p><p>9:44: Expected @param tag for 'n'.:</p><p>11:21: '25' is a magic number.:</p><p><b>Score</b></p>
-<p>0</p><p><a href="JUnitDivisorProblem.jar">Download</a></body></html>
+<p>2: Missing a Javadoc comment.:</p><p>6:12: Unused @param tag for 'args'.:</p><p>9: Expected an @return tag.:</p><p>9:48: Expected @param tag for 'n'.:</p><p><b>Score</b></p>
+<p>1/3</p><p><a href="JUnitDivisorProblem.jar">Download</a></body></html>

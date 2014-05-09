@@ -1,8 +1,7 @@
 Starting audit...
 /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:2: Missing a Javadoc comment.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:6:8: Unused @param tag for 'args'.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:6:12: Unused @param tag for 'args'.
 /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:9: Expected an @return tag.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:9:44: Expected @param tag for 'n'.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:11:21: '25' is a magic number.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/Divisor.java:9:48: Expected @param tag for 'n'.
 Audit done.
 com.horstmann.codecheck.StudentSecurityManager$ExitException

@@ -342,4 +342,10 @@ public class TextReport implements Report {
 		builder.append('\n');
 		return this;
 	}
+
+	@Override
+	public TextReport addTable(String[] colNames, String[][] rowData) {
+		// TODO Auto-generated method stub
+		return this;
+	}
 }
