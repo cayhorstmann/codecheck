@@ -4,6 +4,11 @@ public class Score {
     private int total;
     private int passed;
 
+    public void reset() {
+    	total = 0;
+    	passed = 0;
+    }
+    
     public void pass() {
         total++;
         passed++;

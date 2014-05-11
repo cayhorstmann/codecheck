@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import com.horstmann.codecheck.rule.Point;
 
 //@RunWith(CodeCheckRunner.class)
 public class JUnitDivisorTest {

@@ -47,8 +47,6 @@ import org.junit.runner.Result;
 
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
-import com.horstmann.codecheck.rule.JUnitListener;
-
 /*
  * Run this program from the "work directory", the directory in which all compilation and
  * execution happens. The submission directory and problem directory are left untouched.
@@ -686,6 +684,7 @@ public class Main {
         	}
         }
         
+        System.out.println(jUnitPath);
         int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar" + ":" + jUnitPath + "/CodecheckRunner.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
         if (result != 0) {
@@ -712,27 +711,32 @@ public class Main {
     	List<String> methods = new ArrayList<String>();
     	List<String> outcomes = new ArrayList<String>();
     	List<String> reasons = new ArrayList<String>();
+    	List<String> points = new ArrayList<String>();
     	JUnitCore runner = new JUnitCore();
-    	JUnitListener listener = new JUnitListener(methods, outcomes, reasons); 
+    	
+    	JUnitListener listener = new JUnitListener(methods, outcomes, reasons, points); 
     	runner.addListener(listener);
     	Result r = runner.run(c);
     	
+    	score.reset();
     	//Print to report   	
-    	String[] colNames = new String[]{"Method", "Outcome", "Reason"};
+    	String[] colNames = new String[]{"Method", "Outcome", "Reason", "Score"};
     	String[][] rowData = new String[methods.size()][colNames.length];
     	for (int i = 0; i < methods.size(); i++) {
     		rowData[i][0] = methods.get(i);
     		rowData[i][1] = outcomes.get(i);
     		rowData[i][2] = reasons.get(i);
+    		rowData[i][3] = points.get(i);
+    		
+    		int s = Integer.parseInt(points.get(i));
+    		if (s == 0)
+    			score.pass(false);
+    		else 
+    			for (int j = 0; j < s; j++)
+    				score.pass(true);
     	}
     	report.header("Result");
     	report.addTable(colNames, rowData);
-    	
-    	System.out.println("Test score: " + (r.getRunCount() - r.getFailureCount()) + "/" + r.getRunCount());
-    	for (int i = 0; i < r.getRunCount()- r.getFailureCount(); i++)
-    		score.pass(true);
-    	for (int i = 0; i < r.getFailureCount(); i++)
-    		score.pass(false);
     	
     	System.out.println("Done JUnit");
     }
