@@ -10,7 +10,7 @@ public class JUnitDivisorTest {
     
     Divisor divisor;
     
-    //@Point()
+    @Point(2)
 	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        

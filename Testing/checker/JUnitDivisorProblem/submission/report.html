@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>Report</title></head><body>
 <!-- UID: JUnitDivisorProblem -->
 <!-- Level: 1 -->
-<!-- Time: 2014-05-09T18:09:02Z -->
+<!-- Time: 2014-05-11T07:47:36Z -->
 <p><b>Result</b></p>
 <table style="font-size: 0.9em;">
 <tr><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Method</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Outcome</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Reason</th></tr>
@@ -98,7 +98,7 @@ public class JUnitDivisorTest {
     
     Divisor divisor;
     
-    //@Point()
+    @Point(2)
 	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        

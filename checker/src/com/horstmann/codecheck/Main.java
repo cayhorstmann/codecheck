@@ -44,9 +44,10 @@ import javax.tools.ToolProvider;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
-import org.junit.runner.notification.Failure;
 
 import com.puppycrawl.tools.checkstyle.api.Utils;
+
+import com.horstmann.codecheck.rule.JUnitListener;
 
 /*
  * Run this program from the "work directory", the directory in which all compilation and
@@ -685,7 +686,7 @@ public class Main {
         	}
         }
         
-        int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar",
+        int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar" + ":" + jUnitPath + "/CodecheckRunner.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
         if (result != 0) {
             String errorReport = errStream.toString();
@@ -726,7 +727,6 @@ public class Main {
     	}
     	report.header("Result");
     	report.addTable(colNames, rowData);
-    	
     	
     	System.out.println("Test score: " + (r.getRunCount() - r.getFailureCount()) + "/" + r.getRunCount());
     	for (int i = 0; i < r.getRunCount()- r.getFailureCount(); i++)
