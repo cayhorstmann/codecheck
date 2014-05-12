@@ -9,6 +9,14 @@ public class Score {
     	passed = 0;
     }
     
+    public void setTotal(int total) {
+    	this.total = total;
+    }
+    
+    public void setPassed(int passed) {
+    	this.passed = passed;
+    }
+    
     public void pass() {
         total++;
         passed++;

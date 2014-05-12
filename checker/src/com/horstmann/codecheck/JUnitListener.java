@@ -5,8 +5,7 @@ import java.util.List;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
-
-import com.horstmann.codecheck.rule.Point;
+import com.horstmann.codecheck.rule.Score;
 
 public class JUnitListener extends RunListener {
 	List<String> methods;
@@ -14,6 +13,7 @@ public class JUnitListener extends RunListener {
 	List<String> reasons;
 	List<String> points;
 	int totalScore, maxScore;
+	int maxPoint;
 
 	public JUnitListener(List<String> methods, List<String> outcomes, List<String> reasons, List<String> points) {
 		this.methods = methods;
@@ -30,15 +30,15 @@ public class JUnitListener extends RunListener {
 		outcomes.add("Pass");
 		reasons.add("");
 		
-		int value = 1;
-		Point point = description.getAnnotation(Point.class);
+		maxPoint = 1;
+		Score score = description.getAnnotation(Score.class);
 		
-		if (point != null) {
-			value = point.value(); 
+		if (score != null) {
+			maxPoint = score.value(); 
 		}
-		points.add(value + "");
-		maxScore += value;
-		totalScore += value;
+		points.add(maxPoint + " / " + maxPoint);
+		maxScore += maxPoint;
+		totalScore += maxPoint;
 	}
 	
 	public void testFailure(Failure failure) 
@@ -48,8 +48,10 @@ public class JUnitListener extends RunListener {
 		outcomes.add("Fail");
 		reasons.remove(index);
 		reasons.add(failure.getMessage());
-		totalScore -= Integer.parseInt(points.remove(index));
-		points.add("0");
+		points.remove(index);
+		points.add("0 / " + maxPoint);
+		
+		totalScore -= maxPoint;
 	}
 	
 	public int getMaxScore() {

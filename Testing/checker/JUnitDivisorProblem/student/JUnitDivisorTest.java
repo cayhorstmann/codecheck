@@ -4,19 +4,19 @@ import org.junit.Test;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.horstmann.codecheck.rule.Point;
+import com.horstmann.codecheck.rule.Score;
 
-//@RunWith(CodeCheckRunner.class)
 public class JUnitDivisorTest {
     
     Divisor divisor;
     
-    @Point(2)
+    @Score(10)
 	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        
     } 	
     
+    @Score(3)
     @Test(timeout = 100) 
     public void test2() {
         assertEquals("Test 2, n = 100", 9, Divisor.numberOfDivisors(100));        
