@@ -24,8 +24,7 @@ public class JUnitListener extends RunListener {
 		maxScore = 0;
 	}
 	
-	public void testStarted(Description description)
-	{
+	public void testStarted(Description description) {
 		methods.add(description.getMethodName());
 		outcomes.add("Pass");
 		reasons.add("");
@@ -41,8 +40,7 @@ public class JUnitListener extends RunListener {
 		totalScore += maxPoint;
 	}
 	
-	public void testFailure(Failure failure) 
-	{
+	public void testFailure(Failure failure) {
 		int index = methods.size() - 1;
 		outcomes.remove(index);
 		outcomes.add("Fail");

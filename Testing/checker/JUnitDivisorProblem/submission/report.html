@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>Report</title></head><body>
 <!-- UID: JUnitDivisorProblem -->
 <!-- Level: 1 -->
-<!-- Time: 2014-05-12T21:06:49Z -->
+<!-- Time: 2014-05-16T22:13:16Z -->
 <p><b>Result</b></p>
 <table style="font-size: 0.9em;">
 <tr><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Method</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Outcome</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Reason</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Score</th></tr>
 <tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test1</td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: green">pass</span></td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">&nbsp;</td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">10 / 10</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test timed out after 100 milliseconds</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">0 / 3</td>
 </tr>
 <tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test2</td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">Test 2, n = 100 expected:&lt;9&gt; but was:&lt;25&gt;</td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">0 / 3</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: green">pass</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">&nbsp;</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">1 / 1</td>
 </tr>
 <tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test3</td>
 <td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
-<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">Test 3, n = 1283 expected:&lt;16&gt; but was:&lt;25&gt;</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">Test 3, n = 1283 expected:&lt;16&gt; but was:&lt;641&gt;</td>
 <td style="background: #EEE; margin: 0.5em; padding: 0.25em;">0 / 1</td>
+</tr>
+<tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">test4</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: green">pass</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">&nbsp;</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">1 / 1</td>
 </tr>
 </table>
 <p><b>Student files</b></p>
@@ -41,7 +46,12 @@
 <span style="color: gray;"> 17</span>
 <span style="color: gray;"> 18</span>
 <span style="color: gray;"> 19</span>
-</pre></td><td><pre>
+<span style="color: gray;"> 20</span>
+<span style="color: gray;"> 21</span>
+<span style="color: gray;"> 22</span>
+<span style="color: gray;"> 23</span>
+</pre></td><td><pre>import java.util.ArrayList;
+
 public class Divisor 
 {
 
@@ -52,12 +62,15 @@ public class Divisor
 	public static int numberOfDivisors(int n) 
 	{
 		int count = 25;	
-		/*
-		while (count != 0) {
-            count--;
+		if (n == 10000) { //Timeout
+		    while (count != 0)
+		        count -= 2;
+		    return count;
 		}
-		*/
-		return count;
+		if (n == 100) return 9; //pass
+		
+		count = n / 2;
+	    return count;
 	}
 }
 </pre></td></tr></table><p><b>Other files</b></p>
@@ -90,6 +103,13 @@ public class Divisor
 <span style="color: gray;"> 27</span>
 <span style="color: gray;"> 28</span>
 <span style="color: gray;"> 29</span>
+<span style="color: gray;"> 30</span>
+<span style="color: gray;"> 31</span>
+<span style="color: gray;"> 32</span>
+<span style="color: gray;"> 33</span>
+<span style="color: gray;"> 34</span>
+<span style="color: gray;"> 35</span>
+<span style="color: gray;"> 36</span>
 </pre></td><td><pre>import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -98,17 +118,19 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.horstmann.codecheck.rule.Score;
 
+import java.util.ArrayList;
+
 public class JUnitDivisorTest {
     
     Divisor divisor;
     
-    @Score(10)
+    @Score(3)
 	@Test(timeout = 100) 
     public void test1() {
         assertEquals("Test 1, n = 10000", 25, Divisor.numberOfDivisors(10000));        
     } 	
     
-    @Score(3)
+    @Score(1)
     @Test(timeout = 100) 
     public void test2() {
         assertEquals("Test 2, n = 100", 9, Divisor.numberOfDivisors(100));        
@@ -118,7 +140,12 @@ public class JUnitDivisorTest {
     public void test3() {
         assertEquals("Test 3, n = 1283", 16, Divisor.numberOfDivisors(1283));        
     }
+    
+    @Test(expected= IndexOutOfBoundsException.class) 
+    public void test4() {
+        new ArrayList&lt;Integer&gt;().get(0);
+    }
 }
 </pre></td></tr></table><p><b>CheckStyle report: </b></p>
-<p>2: Missing a Javadoc comment.:</p><p>6:12: Unused @param tag for 'args'.:</p><p>9: Expected an @return tag.:</p><p>9:48: Expected @param tag for 'n'.:</p><p><b>Score</b></p>
-<p>10/14</p><p><a href="JUnitDivisorProblem.jar">Download</a></body></html>
+<p>3: Missing a Javadoc comment.:</p><p>7:12: Unused @param tag for 'args'.:</p><p>10: Expected an @return tag.:</p><p>10:48: Expected @param tag for 'n'.:</p><p><b>Score</b></p>
+<p>2/6</p><p><a href="JUnitDivisorProblem.jar">Download</a></body></html>

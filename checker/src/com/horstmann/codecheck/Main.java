@@ -21,6 +21,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,6 +40,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.script.ScriptException;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
@@ -672,18 +674,18 @@ public class Main {
         OutputStream outStream = null; //new ByteArrayOutputStream();
         OutputStream errStream = null; //new ByteArrayOutputStream();
         
-        String jUnitPath = "";
+        String libraryPath = "";
         for (URL url : ((URLClassLoader) getClass().getClassLoader()).getURLs()) {
         	String urlString = url.toString();
         	if (urlString.endsWith("junit.jar")) {
-        		jUnitPath = urlString.substring(urlString.indexOf('/'),
+        		libraryPath = urlString.substring(urlString.indexOf('/'),
         		urlString.lastIndexOf('/'));
         		break;
         	}
         }
         
-        System.out.println(jUnitPath);
-        int result = compiler.run(null, null, null, "-cp", ".:" + jUnitPath + "/junit.jar" + ":" + jUnitPath + "/CodecheckScore.jar",
+        System.out.println(libraryPath);
+        int result = compiler.run(null, null, null, "-cp", ".:" + libraryPath + "/junit.jar" + ":" + libraryPath + "/CodecheckScore.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
         if (result != 0) {
             String errorReport = errStream.toString();
@@ -735,6 +737,11 @@ public class Main {
     	
     	System.out.println("Done JUnit");
     }
+
+    private boolean isParametricProblem() {
+    	File f = new File(problemDir.toString() + "/params.js");
+    	return f.exists();
+    }
     
     public void run(String[] args) throws IOException, ReflectiveOperationException {
         // TODO: Adjustable Timeouts
@@ -752,6 +759,28 @@ public class Main {
         System.out.println("Solution & Student folders: " + problemDir.toString());
         System.out.println("Submission folder: " + submissionDir.toString());
         System.out.println("-----");
+        
+        //Check if there is params.js file --> Parameter Problem --> substitute javascript expression by its value
+        if (isParametricProblem()) {
+        	System.out.println("Parametric Problem");
+        	//substitute all files in problemDir --> workDir/temp
+        	//change problemDir = workDir/temp
+        	
+        	//Path workDir = new File(".").getAbsoluteFile().toPath().normalize();
+    		//Path problemDir = Paths.get(workDir.toString() + "/countDigitProblem/");
+    		
+    		ParametricProblem paraProb = new ParametricProblem();
+    		try {
+				paraProb.run(workDir, problemDir);
+				
+			} catch (ScriptException e) {
+				e.printStackTrace();
+			}
+    		problemDir = Paths.get(workDir.toString() + "/temp");  
+        	
+        } else {
+        	System.out.println("Normal problem");
+        }
         
         if (System.getProperty("com.horstmann.codecheck.textreport") != null)
         	report = new TextReport(args.length >= 4 ? args[3] : "Report", submissionDir);
@@ -841,6 +870,7 @@ public class Main {
             for (String modeDir : studentDirectories)
                 getGradingFiles(problemDir.resolve(modeDir));
 
+            //Copying all required files into working folder
             Set<String> missingClasses = new TreeSet<>();
             for (Path file : requiredFiles) {
                 Path source = submissionDir.resolve(file);

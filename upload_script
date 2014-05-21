@@ -5,6 +5,9 @@ CODECHECK_HOME=/codecheck
 cd ../checker
 ant clean
 ant
+
+rsync -e "ssh -p 62222" codecheck.jar minh@cs35.cs.sjsu.edu:codecheck/checker
+
 rsync -e "ssh -p 62222" codecheck.jar lib/* minh@cs35.cs.sjsu.edu:codecheck/checker
 
 rsync -e "ssh -p 62222" codecheck.jar lib $HOST:$CODECHECK_HOME
