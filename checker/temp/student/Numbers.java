@@ -1,11 +1,12 @@
 public class Numbers {
     /**
-        Counts the number of digits with value 7 in a given number
+        Counts the number of digits with value 0 in a given number
         @param n any non-negative number
-        @return the number of digits with value 7 in the decimal representation of n
+        @return the number of digits with value 0 in the decimal representation of n
     */
-    public int countSevens(int n) {
+    public int countZeros(int n) {
         // your work here
+        return 0;        
     }
 }
 

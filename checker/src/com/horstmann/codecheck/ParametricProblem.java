@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import javax.script.ScriptException;
 
@@ -17,6 +18,11 @@ public class ParametricProblem {
     private Path problemDir;
     private Path tempDir;
     private ScriptRunner sRunner = new ScriptRunner();
+    private long cookie;
+    
+    public ParametricProblem(long cookie) {
+    	this.cookie = cookie;
+    }
     
 	public void run(Path workDir, Path problemDir) throws IOException, ScriptException {
 		this.workDir = workDir;
@@ -29,6 +35,8 @@ public class ParametricProblem {
 	        if (Files.exists(tempDir))
 	        	deleteFolder(new File(tempDir.toString()));
 	        
+	        //adding cookie
+	        sRunner.putValue("codecheck", new Functions(cookie));
 	        
 	        Files.createDirectory(tempDir);	        
 	        //Run Params.js on at the beginning
@@ -108,7 +116,16 @@ public class ParametricProblem {
 						}
 						
 						String key = sCurrentLine.substring(i + 2, j - 1);
+						/*
+						if (key.contains("{=")) 
+							key = substituion(key);
+						*/
+						System.out.println("key = " + key);
+						
 						String value = sRunner.getValue(key.trim());
+						System.out.println("value = " + value);
+						
+						
 						
 						if (value == "") {
 							value = sRunner.executeScript(key);
@@ -133,5 +150,10 @@ public class ParametricProblem {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	private String substitution(String key) {
+		
+		return "";
 	}
 }

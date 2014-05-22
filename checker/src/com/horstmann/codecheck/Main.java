@@ -1,11 +1,13 @@
 package com.horstmann.codecheck;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,6 +49,7 @@ import javax.tools.ToolProvider;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
+import com.google.common.base.Function;
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /*
@@ -743,9 +746,19 @@ public class Main {
     	return f.exists();
     }
     
+    private long getCookieValue(Path submissionDir) {
+    	long result = -1;
+    	
+    	try (BufferedReader in = new BufferedReader(new FileReader(submissionDir.toString() + "/cookie.dat"))) {
+			result = Long.parseLong(in.readLine());
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	} 
+    	
+    	return result;
+    }
+    
     public void run(String[] args) throws IOException, ReflectiveOperationException {
-        // TODO: Adjustable Timeouts
-
 //        System.out.println("API called succesfully");
     	// TODO: What if args[0], args[1] don't exist?
     	
@@ -763,13 +776,11 @@ public class Main {
         //Check if there is params.js file --> Parameter Problem --> substitute javascript expression by its value
         if (isParametricProblem()) {
         	System.out.println("Parametric Problem");
-        	//substitute all files in problemDir --> workDir/temp
-        	//change problemDir = workDir/temp
+    		//get cookie from file in submissionDir 
         	
-        	//Path workDir = new File(".").getAbsoluteFile().toPath().normalize();
-    		//Path problemDir = Paths.get(workDir.toString() + "/countDigitProblem/");
-    		
-    		ParametricProblem paraProb = new ParametricProblem();
+        	
+        	long cookie = getCookieValue(submissionDir);
+    		ParametricProblem paraProb = new ParametricProblem(cookie);
     		try {
 				paraProb.run(workDir, problemDir);
 				

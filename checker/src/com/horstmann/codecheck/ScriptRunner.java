@@ -32,6 +32,10 @@ public class ScriptRunner {
 		return result;
 	}
 	
+	public void putValue(String key, Object value) {
+		engine.put(key, value);
+	}
+	
 	public String getValue(String key) throws ScriptException {
 		String result = "";
 		Object v = engine.get(key);
@@ -56,11 +60,12 @@ public class ScriptRunner {
 					isInteger = false;
 					break;
 				}
-			if (isInteger) {
+			if (isInteger && t.indexOf(".") != -1) {
 				t = t.substring(0, t.indexOf("."));
 			}
 			result = t;
 		}
+		
 		return result;
 	}
 
