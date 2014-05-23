@@ -1,17 +1,17 @@
 public class Numbers {
     /**
-        Counts the number of digits with value 0 in a given number
+        Counts the number of digits with value 6 in a given number
         @param n any non-negative number
-        @return the number of digits with value 0 in the decimal representation of n
+        @return the number of digits with value 6 in the decimal representation of n
     */
-    //CALL 6071900
-    //CALL 400000380
-    //CALL 791
-    //CALL 76550
-    //CALL 90000000
-    public int countZeros(int n) {
+    //CALL 2000083
+    //CALL 481010000
+    //CALL 403
+    //CALL 41910
+    //CALL 50000000
+    public int countSixs(int n) {
         // your work here
-        char d = (char) ('0' + 0); 
+        char d = (char) ('0' + 6); 
         
         int result = 0;
         String s = n + "";

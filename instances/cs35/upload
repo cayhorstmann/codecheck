@@ -1,21 +1,14 @@
 cd `dirname $0`/../../server
-ant war
-jar uf antbuild/codecheck.war -C ../instances/aws WEB-INF/web.xml
-rsync -e "ssh -i /home/cay/.ec2/aws1.pem" \
-    -avz \
-    antbuild/codecheck.war \
-    $EC2_HOST:/opt/glassfish4/glassfish/domains/domain1/autodeploy/
+
+#ant war
+#jar uf antbuild/codecheck.war -C ../instances/aws WEB-INF/web.xml
+
+#rsync -e "ssh -p 62222" antbuild/codecheck.war minh@cs35.cs.sjsu.edu:glassfish4/glassfish/domains/domain1/autodeploy/
 
 cd ../checker
 ant
 
-rsync -e "ssh -i /home/cay/.ec2/aws1.pem" \
-    -avz \
-    codecheck.jar horstmanncomodo.jks \
-    $EC2_HOST:/home/ubuntu/codecheck/
+rsync -e "ssh -p 62222" codecheck.jar minh@cs35.cs.sjsu.edu:codecheck/checker
 
-rsync -e "ssh -i /home/cay/.ec2/aws1.pem" \
-    -avz \
-    ../instances/aws/codecheck \
-    $EC2_HOST:/home/ubuntu/codecheck/
+#rsync -e "ssh -p 62222" lib/* minh@cs35.cs.sjsu.edu:codecheck/checker/lib
 

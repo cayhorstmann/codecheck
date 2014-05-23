@@ -40,6 +40,9 @@ public class ScriptRunner {
 		String result = "";
 		Object v = engine.get(key);
 		
+		if (v == null) 
+			v = executeScript(key);
+		
 		if (v == null) return "";
 		
 		if (v.toString().charAt(0) == '[') {

@@ -1,17 +1,17 @@
 public class NumbersCodeCheck {
     /**
-        Counts the number of digits with value 0 in a given number
+        Counts the number of digits with value 6 in a given number
         @param n any non-negative number
-        @return the number of digits with value 0 in the decimal representation of n
+        @return the number of digits with value 6 in the decimal representation of n
     */
-    //CALL 6071900
-    //CALL 400000380
-    //CALL 791
-    //CALL 76550
-    //CALL 90000000
-    public int countZeros(int n) {
+    //CALL 2000083
+    //CALL 481010000
+    //CALL 403
+    //CALL 41910
+    //CALL 50000000
+    public int countSixs(int n) {
         // your work here
-        char d = (char) ('0' + 0); 
+        char d = (char) ('0' + 6); 
         
         int result = 0;
         String s = n + "";
@@ -27,41 +27,41 @@ public class NumbersCodeCheck {
         NumbersCodeCheck obj2 = new NumbersCodeCheck();
         if (args[0].equals("1"))
         {
-            Object expected = obj2.countZeros(6071900);
+            Object expected = obj2.countSixs(2000083);
             System.out.println(expected);
-            Object actual = obj1.countZeros(6071900);
+            Object actual = obj1.countSixs(2000083);
             System.out.println(actual);
             System.out.println(java.util.Objects.deepEquals(actual, expected));
         }
         if (args[0].equals("2"))
         {
-            Object expected = obj2.countZeros(400000380);
+            Object expected = obj2.countSixs(481010000);
             System.out.println(expected);
-            Object actual = obj1.countZeros(400000380);
+            Object actual = obj1.countSixs(481010000);
             System.out.println(actual);
             System.out.println(java.util.Objects.deepEquals(actual, expected));
         }
         if (args[0].equals("3"))
         {
-            Object expected = obj2.countZeros(791);
+            Object expected = obj2.countSixs(403);
             System.out.println(expected);
-            Object actual = obj1.countZeros(791);
+            Object actual = obj1.countSixs(403);
             System.out.println(actual);
             System.out.println(java.util.Objects.deepEquals(actual, expected));
         }
         if (args[0].equals("4"))
         {
-            Object expected = obj2.countZeros(76550);
+            Object expected = obj2.countSixs(41910);
             System.out.println(expected);
-            Object actual = obj1.countZeros(76550);
+            Object actual = obj1.countSixs(41910);
             System.out.println(actual);
             System.out.println(java.util.Objects.deepEquals(actual, expected));
         }
         if (args[0].equals("5"))
         {
-            Object expected = obj2.countZeros(90000000);
+            Object expected = obj2.countSixs(50000000);
             System.out.println(expected);
-            Object actual = obj1.countZeros(90000000);
+            Object actual = obj1.countSixs(50000000);
             System.out.println(actual);
             System.out.println(java.util.Objects.deepEquals(actual, expected));
         }
