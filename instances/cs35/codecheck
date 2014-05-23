@@ -1,0 +1,37 @@
+#!/bin/bash
+echo "Start running scipt"
+# Already has student files in temp directory $2
+if [ "$1" == "-q" ] ; then shift ; fi
+
+BASEDIR=`dirname $0`
+
+if [ "${BASEDIR/#\//}" == "$BASEDIR" ] ; then BASEDIR=`pwd`/"$BASEDIR" ; fi
+
+echo $BASEDIR
+
+CLASSPATH=$BASEDIR/codecheck.jar:$BASEDIR/lib/*
+
+echo $CLASSPATH
+
+JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+echo $JAVA_HOME
+# Removed DISPLAY=:3 
+
+cd $2
+
+REPORT_JAR=`basename $3`.signed.zip
+jar cf $REPORT_JAR .
+
+LC_ALL=en_US.UTF-8 $JAVA_HOME/bin/java -Dcom.horstmann.codecheck -classpath $CLASSPATH com.horstmann.codecheck.Main $1 $2 $3 >> codecheck.out 2>&1
+
+jar uf $REPORT_JAR report.html
+
+MATCH=(`grep  -o '^[<]!-- ID: \(.*\) -->$' report.html`)
+ID=${MATCH[2]}
+if [[ -n $ID ]] ; then
+  mv $REPORT_JAR $ID.signed.zip
+  REPORT_JAR=$ID.signed.zip
+fi
+
+jarsigner -keystore "$BASEDIR/horstmanncomodo.jks" -storepass rivu6nitt $REPORT_JAR  horstmanncomodo2013 > /dev/null

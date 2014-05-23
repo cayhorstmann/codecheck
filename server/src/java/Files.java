@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
@@ -52,17 +53,17 @@ public class Files {
     @GET
     @javax.ws.rs.Path("/{problem}") 
     @Produces("text/html")
-    public String files(@PathParam("problem") String problem)
+    public String files(@PathParam("problem") String problem, @CookieParam("ckid") String ckid)
     		throws IOException {
-    	return files("ext", problem, "check", false);
+    	return files("ext", problem, "check", false, ckid);
     }
 
     @GET
     @javax.ws.rs.Path("/{problem}/{level}") 
     @Produces("text/html")
-    public String files(@PathParam("problem") String problem, @PathParam("level") String level)
+    public String files(@PathParam("problem") String problem, @PathParam("level") String level, @CookieParam("ckid") String ckid)
     		throws IOException {
-    	return files("ext", problem, level, false);
+    	return files("ext", problem, level, false, ckid);
     }
     
     @GET
@@ -71,9 +72,13 @@ public class Files {
     public String files(@QueryParam("repo") @DefaultValue("ext") String repo,
                         @QueryParam("problem") String problemName,
                         @DefaultValue("check") @QueryParam("level") String level,
-                        @DefaultValue("false") @QueryParam("upload") boolean upload)
+                        @DefaultValue("false") @QueryParam("upload") boolean upload,
+                        @CookieParam("ckid") String ckid)
     throws IOException {
-    	//get cookie from browser	
+    	//get cookie from browser
+    	System.out.println("In /FILES");
+    	
+    	/*
         Cookie[] cookies = request.getCookies();
         String cookieValue = "";
         if (cookies != null) {
@@ -84,13 +89,20 @@ public class Files {
 	        	}
 	        }
         }
+        */
+    	
         //set cookie to browser
-        if (cookieValue == "") {
+        if (ckid == null) {
+        	System.out.println("Cookie is NULL");
         	Random rd = new Random();
-        	cookieValue = rd.nextLong() + "";
-        	Cookie cookie = new Cookie("ckid", cookieValue);
+        	ckid = rd.nextLong() + "";
+            Cookie cookie = new Cookie("ckid", ckid);
+            cookie.setMaxAge(180 * 24 * 60 * 60);
+            cookie.setSecure(false);
+            cookie.setPath("/codecheck");
             response.addCookie(cookie);
         }
+        System.out.println("ckid = " + ckid);
         
     	StringBuilder result = new StringBuilder();
         result.append(start);
@@ -106,7 +118,7 @@ public class Files {
         if (isParametricProblem(problemPath)) {
         	System.out.println("Parametric Problem");
         	
-        	long cookie = Long.parseLong(cookieValue);
+        	long cookie = Long.parseLong(ckid);
     		ParametricProblem paraProb = new ParametricProblem(cookie);
     		
     		Path submissionDir = Util.getDir(context, "submissions");
@@ -166,6 +178,7 @@ public class Files {
         }
         
         // TODO: In file upload, must still SHOW the non-empty required files
+        
         String requestURL = request.getRequestURL().toString();
         String url = requestURL.substring(0, requestURL.indexOf("files")) + (upload ? "checkUpload" : "check");
         

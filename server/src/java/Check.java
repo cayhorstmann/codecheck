@@ -7,54 +7,36 @@ import java.nio.file.Path;
 import java.util.Random;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 @javax.ws.rs.Path("/check")
 public class Check {
     @Context ServletContext context;
-    @Context private HttpServletRequest request;
-    @Context private HttpServletResponse response;
+    //@Context private HttpServletRequest request;
+    //@Context private HttpServletResponse response;
     
     static Random random = new Random();
 
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("text/html")
-    public Response check(MultivaluedMap<String, String> formParams)
+    public Response check(MultivaluedMap<String, String> formParams, @CookieParam("ckid") String ckid)
     throws IOException {
     	//get cookie from browser
     	System.out.println("In /CHECK");
-        Cookie[] cookies = request.getCookies();
-        if (request == null) {
-        	System.out.println("Request NULL");
-        } else {
-        	System.out.println("Request is good");
+    	
+        if (ckid == null) {
+        	System.out.println("Cookie is NULL");
+        	ckid = random.nextLong() + "";
         }
-        
-        String cookieValue = "";
-        if (cookies != null) {
-	        for (int i = 0; i < cookies.length; i++) {
-	        	String name = cookies[i].getName();
-	        	if (name.equals("ckid")) {
-	        		cookieValue = cookies[i].getValue();
-	        	}
-	        }
-        }
-        //set cookie to browser
-        if (cookieValue == "") {
-        	Random rd = new Random();
-        	cookieValue = rd.nextLong() + "";
-        	Cookie cookie = new Cookie("ckid", cookieValue);
-            response.addCookie(cookie);
-        }
+        System.out.println("ckid = " + ckid);
         
         Path submissionDir = Util.getDir(context, "submissions");
         Path tempDir = Util.createTempDirectory(submissionDir);
@@ -66,7 +48,7 @@ public class Check {
 		}
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
 		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(cookieValue);
+		bw.write(ckid);
 		bw.close();
         
         String repo = "ext";
@@ -85,14 +67,9 @@ public class Check {
         }
         Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
         Path tempDirName = tempDir.getFileName();
-        // Path reportBaseDir = Util.getDir(context, "reports");
-        // Path reportDir = reportBaseDir.resolve(tempDirName);
-        // Files.createDirectory(reportDir);
-        // Files.copy(tempDir.resolve("report.html"), reportDir.resolve("report.html"));
-        // TODO: Find the JAR file name and move it
-        // Files.copy(tempDir.resolve("report.jar"), reportDir.resolve("report.jar"));
-        // TODO: Remove temp dir?
 
-        return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
+        int age = 180 * 24 * 60 * 60;
+        NewCookie cookie = new NewCookie(new NewCookie("ckid", ckid), "", age, false);
+        return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).cookie(cookie).build();
     }
 }
