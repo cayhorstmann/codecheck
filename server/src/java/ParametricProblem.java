@@ -1,4 +1,3 @@
-package com.horstmann.codecheck;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +16,7 @@ public class ParametricProblem {
 	private Path workDir;
     private Path problemDir;
     private Path tempDir;
-    private ScriptRunner sRunner;
+    private ScriptRunner sRunner; 
     private long cookie;
     
     public ParametricProblem(long cookie) {
@@ -45,9 +44,7 @@ public class ParametricProblem {
 			//Traverse all the files in sub-folders and replace
 			traverseFolder(problemDir);
 			
-		} else {
-			System.out.println("Normal Problem");
-		}
+		} 
 	}
 	
 	private void deleteFolder(File file) {
@@ -120,10 +117,10 @@ public class ParametricProblem {
 						if (key.contains("{=")) 
 							key = substituion(key);
 						*/
-						System.out.println("key = " + key);
+						//System.out.println("key = " + key);
 						
 						String value = sRunner.getValue(key.trim());
-						System.out.println("value = " + value);
+						//System.out.println("value = " + value);
 						
 						
 						

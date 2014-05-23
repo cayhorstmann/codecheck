@@ -36,6 +36,7 @@ public class UploadProblem {
     public Response uploadProblem(@FormDataParam("file") InputStream in, @FormDataParam("file") FormDataContentDisposition fileInfo)
     throws IOException {
         try {
+        	System.out.println("Class UploadProblem - uploadProblem");
             String repoPath = context
                               .getInitParameter("com.horstmann.codecheck.repo." + repo);
             if (repoPath == null) {

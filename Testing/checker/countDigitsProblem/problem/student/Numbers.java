@@ -4,7 +4,7 @@ public class Numbers {
         @param n any non-negative number
         @return the number of digits with value {=digitNumber} in the decimal representation of n
     */
-    public int countZeros(int n) {
+    public int count{=digitString}(int n) {
         // your work here
         return 0;        
     }

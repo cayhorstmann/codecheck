@@ -1,9 +1,15 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Random;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
@@ -13,8 +19,10 @@ import javax.ws.rs.core.Response;
 
 @javax.ws.rs.Path("/check")
 public class Check {
-    @Context
-    ServletContext context;
+    @Context ServletContext context;
+    @Context private HttpServletRequest request;
+    @Context private HttpServletResponse response;
+    
     static Random random = new Random();
 
     @POST
@@ -22,8 +30,45 @@ public class Check {
     @Produces("text/html")
     public Response check(MultivaluedMap<String, String> formParams)
     throws IOException {
+    	//get cookie from browser
+    	System.out.println("In /CHECK");
+        Cookie[] cookies = request.getCookies();
+        if (request == null) {
+        	System.out.println("Request NULL");
+        } else {
+        	System.out.println("Request is good");
+        }
+        
+        String cookieValue = "";
+        if (cookies != null) {
+	        for (int i = 0; i < cookies.length; i++) {
+	        	String name = cookies[i].getName();
+	        	if (name.equals("ckid")) {
+	        		cookieValue = cookies[i].getValue();
+	        	}
+	        }
+        }
+        //set cookie to browser
+        if (cookieValue == "") {
+        	Random rd = new Random();
+        	cookieValue = rd.nextLong() + "";
+        	Cookie cookie = new Cookie("ckid", cookieValue);
+            response.addCookie(cookie);
+        }
+        
         Path submissionDir = Util.getDir(context, "submissions");
         Path tempDir = Util.createTempDirectory(submissionDir);
+        
+        //save cookie to submissionDir
+        File file = new File(tempDir.toString() + "/cookie.dat");
+        if (!file.exists()) {
+			file.createNewFile();
+		}
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(cookieValue);
+		bw.close();
+        
         String repo = "ext";
         String problem = "";
         String level = "check";

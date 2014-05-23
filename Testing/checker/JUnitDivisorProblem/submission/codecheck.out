@@ -1,0 +1,168 @@
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors
+Working directory: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+Solution & Student folders: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/problem
+Submission folder: /home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission
+-----
+Normal problem
+compileJUnit
+/home/minhminh/codecheck/checker/lib
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:7: error: package com.horstmann.codecheck.rule does not exist
+import com.horstmann.codecheck.rule.Score;
+                                   ^
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15: error: cannot find symbol
+    @Score(3)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21: error: cannot find symbol
+    @Score(1)
+     ^
+  symbol:   class Score
+  location: class JUnitDivisorTest
+3 errors

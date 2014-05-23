@@ -311,7 +311,7 @@ public class Main {
     }
 
     private void runCheckStyle(String javaFile) throws FileNotFoundException {
-    	System.out.println("runCheckStyle");
+    	System.out.println("runCheckStyle" + javaFile);
     	
     	PrintStream oldOut = System.out;
         System.setOut(new PrintStream(new FileOutputStream("checkstyle.out")));
@@ -753,6 +753,7 @@ public class Main {
 			result = Long.parseLong(in.readLine());
     	} catch (IOException e) {
     		e.printStackTrace();
+    		return result;
     	} 
     	
     	return result;

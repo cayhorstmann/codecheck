@@ -4,11 +4,11 @@ public class Numbers {
         @param n any non-negative number
         @return the number of digits with value 0 in the decimal representation of n
     */
-    //CALL 6003260
-    //CALL 570200000
-    //CALL 840
-    //CALL 68970
-    //CALL 30000000
+    //CALL 6071900
+    //CALL 400000380
+    //CALL 791
+    //CALL 76550
+    //CALL 90000000
     public int countZeros(int n) {
         // your work here
         char d = (char) ('0' + 0); 

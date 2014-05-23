@@ -50,7 +50,7 @@
   </context-param>    
   <context-param>
     <param-name>com.horstmann.codecheck.defaultcommand</param-name>
-    <param-value>/data/cay/current/projects/codecheck/checker/codecheck -q {0} {1} {2} {3}</param-value>
+    <param-value>/home/minhminh/codecheck/checker/codecheck -q {0} {1} {2} {3}</param-value>
   </context-param>    
   <context-param>
     <param-name>com.horstmann.codecheck.gradecommand</param-name>

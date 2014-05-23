@@ -1,4 +1,4 @@
 Starting audit...
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/parametricProblem/submission/Numbers.java:1: Missing a Javadoc comment.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/countDigitsProblem/submission/Numbers.java:1: Missing a Javadoc comment.
 Audit done.
 com.horstmann.codecheck.StudentSecurityManager$ExitException

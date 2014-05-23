@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -7,12 +8,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.ScriptException;
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
@@ -25,9 +30,9 @@ public class Files {
     private static final Pattern IMG_PATTERN = Pattern
             .compile("[<]\\s*[iI][mM][gG]\\s*[sS][rR][cC]\\s*[=]\\s*['\"]([^'\"]*)['\"][^>]*[>]");
 
-    @Context
-    ServletContext context;
+    @Context ServletContext context;
     @Context private HttpServletRequest request;
+    @Context private HttpServletResponse response;
 
     private static String start = "<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" /></head><body style=\"font-family: sans;\">";
     private static String before = "<form method=\"post\" action=\"{0}\" {1}>";
@@ -68,14 +73,58 @@ public class Files {
                         @DefaultValue("check") @QueryParam("level") String level,
                         @DefaultValue("false") @QueryParam("upload") boolean upload)
     throws IOException {
-        StringBuilder result = new StringBuilder();
+    	//get cookie from browser	
+        Cookie[] cookies = request.getCookies();
+        String cookieValue = "";
+        if (cookies != null) {
+	        for (int i = 0; i < cookies.length; i++) {
+	        	String name = cookies[i].getName();
+	        	if (name.equals("ckid")) {
+	        		cookieValue = cookies[i].getValue();
+	        	}
+	        }
+        }
+        //set cookie to browser
+        if (cookieValue == "") {
+        	Random rd = new Random();
+        	cookieValue = rd.nextLong() + "";
+        	Cookie cookie = new Cookie("ckid", cookieValue);
+            response.addCookie(cookie);
+        }
+        
+    	StringBuilder result = new StringBuilder();
         result.append(start);
 
         Path repoPath = Paths.get(context
                                   .getInitParameter("com.horstmann.codecheck.repo." + repo));
         // TODO: That comes from Problems.java--fix it there
+        System.out.println("repoPath = " + repoPath.toString());
+        
         if (problemName.startsWith("/")) problemName = problemName.substring(1);
         Path problemPath = repoPath.resolve(problemName);
+
+        if (isParametricProblem(problemPath)) {
+        	System.out.println("Parametric Problem");
+        	
+        	long cookie = Long.parseLong(cookieValue);
+    		ParametricProblem paraProb = new ParametricProblem(cookie);
+    		
+    		Path submissionDir = Util.getDir(context, "submissions");
+    		Path workDir = Util.createTempDirectory(submissionDir);
+    		
+    		System.out.println("workDir = " + workDir.toString());
+    		try {
+				paraProb.run(workDir, problemPath);
+				
+			} catch (ScriptException e) {
+				e.printStackTrace();
+			}
+    		problemPath = Paths.get(workDir.toString() + "/temp");
+        } else {
+        	System.out.println("Normal problem");
+        }
+        System.out.println("problem path = " + problemPath.toString());
+        
         Problem problem = new Problem(problemPath, level);
         boolean includeCode = true;
         String description = getDescription(problemPath, "statement.html"); // TODO: Legacy
@@ -115,6 +164,7 @@ public class Files {
                 result.append("</pre\n>");
             }
         }
+        
         // TODO: In file upload, must still SHOW the non-empty required files
         String requestURL = request.getRequestURL().toString();
         String url = requestURL.substring(0, requestURL.indexOf("files")) + (upload ? "checkUpload" : "check");
@@ -123,6 +173,7 @@ public class Files {
                                            upload ? "encoding=\"multipart/form-data\"" : ""));
         result.append(MessageFormat.format(provideStart, requiredFiles.size()));
 
+        
         // TODO: Remove heuristic for codecomp
         if (!upload && useFiles.size() == 0 && requiredFiles.size() == 1) includeCode = true;
 
@@ -209,5 +260,10 @@ public class Files {
             }
         }
         return result.toString();
+    }
+    
+    private boolean isParametricProblem(Path problemDir) {
+    	File f = new File(problemDir.toString() + "/params.js");
+    	return f.exists();
     }
 }

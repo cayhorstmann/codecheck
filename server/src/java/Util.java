@@ -178,6 +178,8 @@ public class Util {
                           .getInitParameter("com.horstmann.codecheck.repo." + repo);
         String command = Util.getProperty(repoPath, "repo.properties",
                                           "repo.command");
+        System.out.println(repoPath);
+        System.out.println(command);
         if (command == null)
             command = context
                       .getInitParameter("com.horstmann.codecheck.defaultcommand");
