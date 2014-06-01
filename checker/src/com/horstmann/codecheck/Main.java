@@ -688,7 +688,7 @@ public class Main {
         }
         
         System.out.println(libraryPath);
-        int result = compiler.run(null, null, null, "-cp", ".:" + libraryPath + "/junit.jar" + ":" + libraryPath + "/CodecheckScore.jar",
+        int result = compiler.run(null, null, null, "-cp", ".:" + libraryPath + "/junit.jar" + ":" + libraryPath + "/hamcrest-core.jar" + ":" + libraryPath + "/CodecheckScore.jar",
                                   "-d", dir.toString(), dir.resolve(classname).toString());
         if (result != 0) {
             String errorReport = errStream.toString();

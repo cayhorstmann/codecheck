@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>Report</title></head><body>
 <!-- UID: problem -->
 <!-- Level: 1 -->
-<!-- Time: 2014-05-22T23:04:55Z -->
+<!-- Time: 2014-06-01T20:53:26Z -->
 <p><b>Result</b></p>
 <table style="font-size: 0.9em;">
 <tr><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Method</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Outcome</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Reason</th><th style="background: #EEE; margin: 0.5em; padding: 0.25em;">Score</th></tr>
@@ -24,6 +24,13 @@
 <td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: green">pass</span></td>
 <td style="background: #EEE; margin: 0.5em; padding: 0.25em;">&nbsp;</td>
 <td style="background: #EEE; margin: 0.5em; padding: 0.25em;">1 / 1</td>
+</tr>
+<tr><td style="background: #EEE; margin: 0.5em; padding: 0.25em;">testHamcrest</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;"><span style="color: red">fail</span></td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">
+Expected: is &lt;4&gt;
+     but: was &lt;10&gt;</td>
+<td style="background: #EEE; margin: 0.5em; padding: 0.25em;">0 / 1</td>
 </tr>
 </table>
 <p><b>Student files</b></p>
@@ -110,7 +117,14 @@ public class Divisor
 <span style="color: gray;"> 34</span>
 <span style="color: gray;"> 35</span>
 <span style="color: gray;"> 36</span>
-</pre></td><td><pre>import static org.junit.Assert.assertEquals;
+<span style="color: gray;"> 37</span>
+<span style="color: gray;"> 38</span>
+<span style="color: gray;"> 39</span>
+<span style="color: gray;"> 40</span>
+<span style="color: gray;"> 41</span>
+<span style="color: gray;"> 42</span>
+</pre></td><td><pre>import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 import org.junit.Ignore;
@@ -123,7 +137,12 @@ import java.util.ArrayList;
 public class JUnitDivisorTest {
     
     Divisor divisor;
-    
+ 
+    @Test
+    public void testHamcrest() {
+        assertThat(Divisor.numberOfDivisors(20), is(4));
+    }
+       
     @Score(3)
 	@Test(timeout = 100) 
     public void test1() {
@@ -148,4 +167,4 @@ public class JUnitDivisorTest {
 }
 </pre></td></tr></table><p><b>CheckStyle report: </b></p>
 <p>11: Missing a Javadoc comment.:</p><p>15:5: Missing a Javadoc comment.:</p><p>21:5: Missing a Javadoc comment.:</p><p>27:5: Missing a Javadoc comment.:</p><p>32:5: Missing a Javadoc comment.:</p><p><b>Score</b></p>
-<p>2/6</p><p><a href="problem.jar">Download</a></body></html>
+<p>2/7</p><p><a href="problem.jar">Download</a></body></html>

@@ -1,4 +1,5 @@
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 import org.junit.Ignore;
@@ -11,7 +12,12 @@ import java.util.ArrayList;
 public class JUnitDivisorTest {
     
     Divisor divisor;
-    
+ 
+    @Test
+    public void testHamcrest() {
+        assertThat(Divisor.numberOfDivisors(20), is(4));
+    }
+       
     @Score(3)
 	@Test(timeout = 100) 
     public void test1() {
