@@ -1,6 +1,7 @@
 package com.horstmann.codecheck;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,7 +51,6 @@ import javax.tools.ToolProvider;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 
-import com.google.common.base.Function;
 import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /*
@@ -68,6 +69,7 @@ public class Main {
     private Properties checkProperties = new Properties();
     private Report report;
     private Path problemDir;
+    private Path submissionDir;
     private Set<Path> studentFiles;
     private Set<Path> requiredFiles = new TreeSet<>(); // tails only
     private Set<Path> solutionFiles;
@@ -78,6 +80,7 @@ public class Main {
     private Comparison comp = new Comparison();
     private String checkStyleFile = "";
     private String jUnitFile = "";
+    private boolean parametric = false;
 
     /**
      * Entry point to program.
@@ -452,8 +455,65 @@ public class Main {
     	return classname != null && classname.matches(".*Tester[0-9]*");
     }
     
+    private void replaceExpectedValues(String mainclass, String[] values) {
+    	String content = "";
+    	int id = 0;
+    	try (BufferedReader br = new BufferedReader(new FileReader(mainclass + ".java")))
+		{
+			String sCurrentLine;
+			while ((sCurrentLine = br.readLine()) != null) {
+				if (sCurrentLine.contains("System.out.println(\"Expected: \");")) {
+					sCurrentLine = sCurrentLine.replace("System.out.println(\"Expected: \");", "System.out.println(\"Expected: " + values[id++].trim() + "\");");
+				}
+				content += sCurrentLine + "\n"; 
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	try {
+			File file = new File(mainclass + ".java");
+ 
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(content);
+			bw.close();
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
     private void runTester(String mainclass) throws IOException, UnsupportedEncodingException,
         ReflectiveOperationException {
+    	
+    	if (parametric) {
+    		//change name of student file in workDir
+    		System.out.println("runTester - parametric problem");
+
+    		//Copy solution files to working directory
+            for (Path file : solutionFiles) {
+                Path source = problemDir.resolve(file);
+                if (Files.exists(source))
+                    Files.copy(source, workDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+            if (compile(mainclass)) {
+                String outerr = runJavaProgram(mainclass, workDir, "", null, timeoutMillis);
+                System.out.println(outerr);
+                String[] values = (outerr.trim() + " ").split("Expected: ");
+                
+                //replace values in mainclass
+                replaceExpectedValues(mainclass, values);
+            }
+            
+            //Copy submission files back to working directory
+            for (Path file : solutionFiles) {
+                Path source = submissionDir.resolve(file.getFileName());
+                if (Files.exists(source))
+                    Files.copy(source, workDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+    	}
+    	
         report.header("Running " + mainclass);
         // TODO: Assume testers always in default package?
         
@@ -774,7 +834,7 @@ public class Main {
     	
     	
         String mode = args[0].trim();
-        Path submissionDir = FileSystems.getDefault().getPath(args[1]);
+        submissionDir = FileSystems.getDefault().getPath(args[1]);
         problemDir = FileSystems.getDefault().getPath(args[2]);
         workDir = new File(".").getAbsoluteFile().toPath().normalize();
         
@@ -784,10 +844,10 @@ public class Main {
         System.out.println("-----");
         
         //Check if there is params.js file --> Parameter Problem --> substitute javascript expression by its value
+        parametric = false;
         if (isParametricProblem()) {
         	System.out.println("Parametric Problem");
     		//get cookie from file in submissionDir 
-        	
         	
         	long cookie = getCookieValue(submissionDir);
     		ParametricProblem paraProb = new ParametricProblem(cookie);
@@ -798,7 +858,7 @@ public class Main {
 				e.printStackTrace();
 			}
     		problemDir = Paths.get(workDir.toString() + "/temp");  
-        	
+    		parametric = true;
         } else {
         	System.out.println("Normal problem");
         }

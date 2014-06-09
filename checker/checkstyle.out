@@ -1,8 +1,7 @@
 Starting audit...
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:11: Missing a Javadoc comment.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:15:5: Missing a Javadoc comment.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:21:5: Missing a Javadoc comment.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:27:5: Missing a Javadoc comment.
-/home/minhminh/eclipse_plugins/codecheck/Testing/checker/JUnitDivisorProblem/submission/JUnitDivisorTest.java:32:5: Missing a Javadoc comment.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/expectedTesterProblem/submission/Divisor.java:1: Missing a Javadoc comment.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/expectedTesterProblem/submission/Divisor.java:5:12: Unused @param tag for 'args'.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/expectedTesterProblem/submission/Divisor.java:8: Expected an @return tag.
+/home/minhminh/eclipse_plugins/codecheck/Testing/checker/expectedTesterProblem/submission/Divisor.java:8:48: Expected @param tag for 'n'.
 Audit done.
 com.horstmann.codecheck.StudentSecurityManager$ExitException
