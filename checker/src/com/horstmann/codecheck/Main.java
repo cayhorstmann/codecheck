@@ -491,6 +491,11 @@ public class Main {
     		//change name of student file in workDir
     		System.out.println("runTester - parametric problem");
 
+    		for (Path file : solutionFiles) {
+                Path source = workDir.resolve(file.getFileName());
+                Files.copy(source, workDir.resolve(file.getFileName() + ".old"), StandardCopyOption.REPLACE_EXISTING);
+            }
+    		
     		//Copy solution files to working directory
             for (Path file : solutionFiles) {
                 Path source = problemDir.resolve(file);
@@ -505,12 +510,12 @@ public class Main {
                 //replace values in mainclass
                 replaceExpectedValues(mainclass, values);
             }
-            
+
+            System.out.println("Submisson files");
             //Copy submission files back to working directory
             for (Path file : solutionFiles) {
-                Path source = submissionDir.resolve(file.getFileName());
-                if (Files.exists(source))
-                    Files.copy(source, workDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                Path source = workDir.resolve(file.getFileName() + ".old");
+                Files.copy(source, workDir.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
             }
     	}
     	

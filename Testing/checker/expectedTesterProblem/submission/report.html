@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="content-type" content="text/html; charset=utf-8" /><title>Report</title></head><body>
 <!-- UID: temp -->
 <!-- Level: 1 -->
-<!-- Time: 2014-06-09T06:29:37Z -->
+<!-- Time: 2014-06-09T06:58:20Z -->
 <p><b>Running expectedDivisorTester</b></p>
-<pre>239
+<pre>97
+<span style="color: red">Expected: 4</span>
+1
 <span style="color: red">Expected: 2</span>
-2
-<span style="color: red">Expected: 3</span>
 </pre>
 <p><b>Student files</b></p>
 <p>Divisor.java:</p><table><tr><td style="padding-right: 1em;"><pre><span style="color: gray;">  1</span>
@@ -54,10 +54,10 @@
     
     public static void main(String[] args) {
         Divisor divisor = new Divisor();
-        System.out.println(divisor.numberOfDivisors(479));
+        System.out.println(divisor.numberOfDivisors(194));
+        System.out.println("Expected: 4");
+        System.out.println(divisor.numberOfDivisors(3));
         System.out.println("Expected: 2");
-        System.out.println(divisor.numberOfDivisors(4));
-        System.out.println("Expected: 3");
     }
 }
 </pre></td></tr></table><p><b>CheckStyle report: </b></p>
