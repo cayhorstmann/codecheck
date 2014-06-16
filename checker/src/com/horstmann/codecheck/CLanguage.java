@@ -1,6 +1,8 @@
 package com.horstmann.codecheck;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -8,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -105,16 +108,77 @@ public class CLanguage implements Language {
 		String result = "";
 		String execCommand = "";
 		
+		
+		
+		////////////////////  OWNERSHIP  //////////////////
+		
+		String systemPassword = "kietkiet";
+		String ownerScript = "#!/bin/bash";
+		ownerScript += String.format("\necho %s | sudo -S useradd %s", systemPassword, classpathDir.getFileName());
+		ownerScript += String.format("\necho %s | sudo -S chown -R username:%s %s", systemPassword, classpathDir.getFileName(), classpathDir);
+		
+		try {
+			FileWriter fw = new FileWriter(String.format("%s/ownerScript", classpathDir),true);
+			Process pOwner1 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/ownerScript", classpathDir));
+			pOwner1.waitFor();
+			fw.write(ownerScript);
+			fw.close();
+			Process pOwner2 = Runtime.getRuntime().exec(classpathDir + File.separator + "ownerScript");
+			pOwner2.waitFor();
+		} catch (Exception e1) {
+    		e1.printStackTrace();
+    	}
+		
+		//////////////////  END OWNERSHIP  ////////////////////////////
+		
+		
+		
 		try
         {
+			
             Runtime r = Runtime.getRuntime();
             
             try {
             	
+            	
             	Process p;
             	
+            	////////////////////  NPE  //////////////////
+            	
+            	String NPEScript = "#!/bin/bash";
+            	NPEScript += String.format("\ngcc -g %s -o %s", classpathDir + "/" + mainclass + ".c", "NPE" + mainclass);
+            	NPEScript += String.format("\nulimit -c unlimited");
+            	NPEScript += String.format("\nrm -f core");
+            	NPEScript += String.format("\n" + classpathDir + "/NPE" + mainclass);
+            	NPEScript += String.format("\necho q | gdb --core=core %s | tail -4 | cat > NPEResult", "NPE" + mainclass);
+            	
+            	try {
+        			FileWriter fw = new FileWriter(String.format("%s/NPEScript", classpathDir),false);
+        			Process p0 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/NPEScript", classpathDir));
+        			p0.waitFor();
+        			fw.write(NPEScript);
+        			fw.close();
+        				
+        			// run the NPEScript
+        			Process p00 = Runtime.getRuntime().exec(classpathDir + File.separator + "NPEScript");
+        			p00.waitFor();
+        			
+        			// Get NPE result
+        			String NPEMessage = new String(java.nio.file.Files.readAllBytes(Paths.get(classpathDir + File.separator + "NPEResult")), "UTF-8");
+                    
+                    if ((NPEMessage.contains("Segmentation"))) {
+                    	return NPEMessage;
+                    }
+        	        
+        		} catch (Exception e1) {
+        			e1.printStackTrace();
+        		}
+            	
+            	//////////////////  END NPE  ////////////////////////////
+            	
+            	
             	if (input != null){
-            		execCommand = "/home/kn-ub64/codecheck/checker/runC.sh " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args  + " 2>&1");
+            		execCommand = "sudo -u " + classpathDir.getFileName() + " timeout 10s " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args  + " 2>&1");
                 	System.out.println("CLanguage run() $execCommand = " + execCommand);
                 	p = r.exec(execCommand);
                 	p.getOutputStream();
@@ -123,7 +187,7 @@ public class CLanguage implements Language {
         			p.waitFor();
             	}
             	else {
-            		execCommand = "/home/kn-ub64/codecheck/checker/runC.sh " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args) + " 2>&1";
+            		execCommand = "sudo -u " + classpathDir.getFileName() + " timeout 10s " + classpathDir + "/" + mainclass + (args == null || args.trim().equals("") ? "" : " " + args) + " 2>&1";
             		System.out.println("CLanguage run() $execCommand = " + execCommand);
             		p = r.exec(execCommand);
             		p.waitFor();
@@ -133,6 +197,29 @@ public class CLanguage implements Language {
                 while (br.ready()) {
                     result += br.readLine() + "\n";
                 }
+                
+                
+        		////////////////////  REMOVE USER  //////////////////
+        		
+
+        		String removeOwnerScript = "#!/bin/bash";
+        		removeOwnerScript += String.format("\necho %s | sudo -S -u root", systemPassword);
+        		removeOwnerScript += String.format("\necho %s | sudo -S userdel %s", systemPassword, classpathDir.getFileName());
+        		removeOwnerScript += String.format("\necho %s | sudo -S chown -R username:root %s", systemPassword, classpathDir);
+        		
+        		try {
+        			FileWriter fw = new FileWriter(String.format("%s/removeOwnerScript", classpathDir),true);
+        			Process removeOwner1 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/removeOwnerScript", classpathDir));
+        			removeOwner1.waitFor();
+        			fw.write(removeOwnerScript);
+        			fw.close();
+        			Process removeOwner2 = Runtime.getRuntime().exec(classpathDir + File.separator + "removeOwnerScript");
+        			removeOwner2.waitFor();
+        		} catch (Exception e1) {
+            		e1.printStackTrace();
+            	}
+        		
+        		//////////////////  END REMOVE USER   ////////////////////////////
     	        
     		} catch (Exception e1) {
     			e1.printStackTrace();

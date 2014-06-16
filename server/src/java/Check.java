@@ -64,7 +64,7 @@ public class Check {
             }
         }
 
-        //return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
-        return Response.status(200).entity(script.replace("\n", "<br />")).build();
+        return Response.seeOther(URI.create("fetch/" + tempDirName + "/report.html")).build();
+        //return Response.status(200).entity(script.replace("\n", "<br />")).build();
     }
 }
