@@ -40,7 +40,10 @@ public class Check {
             else
                 Util.write(tempDir, key, value);
         }
+        Logger l = Logger.getLogger("");
+        
         String script = Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
+        l.severe(script);
         //Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
         Path tempDirName = tempDir.getFileName();
         // Path reportBaseDir = Util.getDir(context, "reports");
@@ -54,7 +57,7 @@ public class Check {
         File f = new File(tempDir + "/report.html");
         if(!f.exists()) {
         	Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
-        	Logger l = Logger.getLogger("");
+        	
         	File f2 = new File(tempDir + "/report.html");
         	if(!f2.exists()) {
         		l.severe("docker_still_failed -- " + tempDir);

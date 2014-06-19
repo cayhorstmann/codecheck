@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class CLanguage implements Language {
@@ -59,7 +60,7 @@ public class CLanguage implements Language {
 	@Override
 	public boolean compile(String modulename, Path dir, Report report) {
 		
-
+		
 		String compilerMessage = "";
 		try
         {
@@ -108,8 +109,6 @@ public class CLanguage implements Language {
 		String result = "";
 		String execCommand = "";
 		
-		
-		
 		////////////////////  OWNERSHIP  //////////////////
 		
 		String systemPassword = "kietkiet";
@@ -118,11 +117,11 @@ public class CLanguage implements Language {
 		ownerScript += String.format("\necho %s | sudo -S chown -R username:%s %s", systemPassword, classpathDir.getFileName(), classpathDir);
 		
 		try {
-			FileWriter fw = new FileWriter(String.format("%s/ownerScript", classpathDir),true);
-			Process pOwner1 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/ownerScript", classpathDir));
-			pOwner1.waitFor();
+			FileWriter fw = new FileWriter(String.format("%s/ownerScript", classpathDir),false);
 			fw.write(ownerScript);
 			fw.close();
+			Process pOwner1 = Runtime.getRuntime().exec("chmod 777 " + String.format("%s/ownerScript", classpathDir));
+			pOwner1.waitFor();
 			Process pOwner2 = Runtime.getRuntime().exec(classpathDir + File.separator + "ownerScript");
 			pOwner2.waitFor();
 		} catch (Exception e1) {
@@ -159,9 +158,20 @@ public class CLanguage implements Language {
         			fw.write(NPEScript);
         			fw.close();
         				
+        			
         			// run the NPEScript
-        			Process p00 = Runtime.getRuntime().exec(classpathDir + File.separator + "NPEScript");
-        			p00.waitFor();
+        			if (input != null){
+	        			Process p00 = Runtime.getRuntime().exec(classpathDir + File.separator + "NPEScript");
+	        			p00.getOutputStream();
+	                	p00.getOutputStream().write(input.getBytes(Charset.forName("UTF-8")));
+	                	p00.getOutputStream().flush();
+	        			p00.waitFor();
+        			}
+                	else {
+                		Process p00 = Runtime.getRuntime().exec(classpathDir + File.separator + "NPEScript");
+                		p00.waitFor();
+                	}
+        			
         			
         			// Get NPE result
         			String NPEMessage = new String(java.nio.file.Files.readAllBytes(Paths.get(classpathDir + File.separator + "NPEResult")), "UTF-8");
@@ -200,7 +210,6 @@ public class CLanguage implements Language {
                 
                 
         		////////////////////  REMOVE USER  //////////////////
-        		
 
         		String removeOwnerScript = "#!/bin/bash";
         		removeOwnerScript += String.format("\necho %s | sudo -S -u root", systemPassword);
