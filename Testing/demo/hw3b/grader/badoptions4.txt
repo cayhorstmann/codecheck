@@ -1,0 +1,6 @@
+A mismatch in options
+This is the question text
+*A) Fred
+B) Wilma
+C) Barney
+*D) Dino

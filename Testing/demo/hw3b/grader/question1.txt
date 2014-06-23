@@ -1,0 +1,16 @@
+
+Consider the following code snippet:
+
+LinkedList<String> words = new LinkedList<String>();
+words.addFirst("abc");
+words.addLast("def");
+words.addFirst("ghi");
+System.out.print(words.removeLast());
+System.out.print(words.removeFirst());
+System.out.print(words.removeLast());
+
+What will this code print when it is executed?
+*A) abcdefghi
+B) ghiabcdef
+C) abcghidef
+D) defghiabc

@@ -66,6 +66,11 @@ public class Check {
                 Util.write(tempDir, key, value);
         }
         Util.runLabrat(context, repo, problem, level, tempDir.toAbsolutePath().toString());
+        System.out.println("Check");
+        System.out.println("repo = " + repo);
+        System.out.println("problem = " + problem);
+        System.out.println("level = " + level);
+        System.out.println("tempDir = " + tempDir.toAbsolutePath().toString());
         Path tempDirName = tempDir.getFileName();
 
         int age = 180 * 24 * 60 * 60;

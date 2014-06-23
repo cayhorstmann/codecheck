@@ -1,11 +1,14 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -18,6 +21,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -50,6 +55,8 @@ public class Files {
     private static String provideStart = "<p>Complete the following {0,choice,1#file|2#files}:</p>";
     // TODO: Separate out empty and nonempty files, with "provide" and "complete"
 
+    private String repo = "ext";
+    
     @GET
     @javax.ws.rs.Path("/{problem}") 
     @Produces("text/html")
@@ -132,6 +139,23 @@ public class Files {
 				e.printStackTrace();
 			}
     		problemPath = Paths.get(workDir.toString() + "/temp");
+    		
+    		System.out.println("submissionDir = " + submissionDir.toString());
+    		
+    		List<File> testers = findTester(problemPath);
+    		if (testers.size() > 0) {
+    			//check(submissionDir);
+    			/*
+    			for (File f : testers) {
+    				System.out.println("Compiling: " + f.getName());
+    				if (compile(f.getName(), problemPath)) {
+    					System.out.println("Compiled: " + f.getName());
+    				}
+    			}
+    			*/
+    		}
+    		
+    		System.out.println("Done Parametric");
         } else {
         	System.out.println("Normal problem");
         }
@@ -278,5 +302,57 @@ public class Files {
     private boolean isParametricProblem(Path problemDir) {
     	File f = new File(problemDir.toString() + "/params.js");
     	return f.exists();
+    }
+    
+    private List<File> findTester(Path problemDir) {
+    	System.out.println("findTester");
+    	List<File> r = new ArrayList<File>();
+    	File folder = new File(problemDir.toString() + "/student");
+    	File[] listOfFiles = folder.listFiles();
+    	for (File f : listOfFiles) {
+    		if (f.getName().matches(".*Tester[0-9]*.java")) {
+    			r.add(f);
+    		}
+    	    
+    	}
+    	return r;
+    }
+    
+    private boolean compile(String classname, Path dir) {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        OutputStream outStream = null; //new ByteArrayOutputStream();
+        OutputStream errStream = null; //new ByteArrayOutputStream();
+        int result = compiler.run(null, outStream, errStream, "-sourcepath", dir.toString(),
+                                  "-d", dir.toString(), dir.resolve(Util.javaPath(classname)).toString());
+        return result == 0;
+    }
+    
+    private void check(Path dir, Path submissionDir) throws IOException {
+        // TODO: Only good for old-style
+    	System.out.println("check - dir = " + dir.toString());
+        int maxLevel = 1;
+        for (int i = 9; i >= 2 && maxLevel == 1; i--) // Find highest level
+            if (java.nio.file.Files.exists(dir.resolve("student" + i)) || java.nio.file.Files.exists(dir.resolve("solution" + i))) maxLevel = i;
+
+        boolean grade = java.nio.file.Files.exists(dir.resolve("grader"));        
+        List<String> subdirs = new ArrayList<>();
+        for (int i = 1; i <= (grade ? maxLevel + 1 : maxLevel); i++) {
+            Path tempDir = Util.createTempDirectory(submissionDir);
+            // Copy solution files up to the current level
+            if (i <= maxLevel) subdirs.add(i == 1 ? "solution" : "solution" + i);
+            for (Path p : Util.getDescendantFiles(dir, subdirs))
+            	java.nio.file.Files.copy(dir.resolve(p), tempDir.resolve(Util.tail(p)));
+
+            String problem = dir.getFileName().toString();
+            String levelString = grade && i == maxLevel + 1 ? "grade" : "" + i;
+            Util.runLabrat(context, repo, problem, levelString, tempDir.toAbsolutePath().toString());
+            System.out.println("Files - check");
+            System.out.println("repo = " + repo);
+            System.out.println("problem = " + problem);
+            System.out.println("level = " + levelString);
+            System.out.println("tempDir = " + tempDir.toAbsolutePath().toString());
+            Path tempDirName = tempDir.getFileName();
+
+        }
     }
 }

@@ -68,7 +68,7 @@ public class ParametricProblem {
 		File folder = new File(dir.toString());
 		File[] allFiles = folder.listFiles();
 		for (File f : allFiles) {
-			if (f.getName().contains("~")) continue;
+			if (f.getName().contains("~") || f.getName().contains("jpg")) continue;
 			if (f.isDirectory()) {
 				Path tFolder = Paths.get(tempDir.toString() + "/" + f.getName());
 		        if (! Files.exists(tFolder)) Files.createDirectory(tFolder);

@@ -1,0 +1,9 @@
+NewQuestion,MC
+Title,"What is wrong with this ""Hello, World"" statement?"
+QuestionText,"System.out.println(""Hello, World"");"
+Points,1
+Difficulty,1
+Option,100,"Nothing"
+Option,0,"Something"
+Option,0,"Everything"
+Option,0,"I don't know"

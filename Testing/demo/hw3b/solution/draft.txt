@@ -1,0 +1,14 @@
+Testing Inputs: First two lines of test3.in pass (max 1 point):
+Should look like this--
+Input test3.in
+
+pass        :    NewQuestion,MC
+pass        :    Title,"What is wrong with this ""Hello, World"" statement?"
+Running Testers: FileNotFoundTester passes (max 1 point):
+Should look like this--
+Running FileNotFoundTester
+Compiling 1 source file to /tmp/solution
+
+No file specified.
+Expected: No file specified.
+

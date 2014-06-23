@@ -1,0 +1,6 @@
+What is wrong with this "Hello, World" statement?
+System.out.println("Hello, World");"
+*A) Nothing
+B) Something
+C) Everything
+D) I don't know
