@@ -1,10 +1,10 @@
-CodeCheck TODO -*- mode: org -*-
+Old CodeCheck TODO -*- mode: org -*-
 
 * Commands
 
 awsweex /assets/receiveMessage.js
 
-sbt -jvm-debug 9999 -Dcom.horstmann.codecheck.s3credentials=/data/cay/projects/codecheck-legacy/instances/s3.properties run
+sbt -jvm-debug 9999 -Dconfig.file=`pwd`/development.conf run
 
 firefox file:///home/cay/projects/play-codecheck/ltitest/index.html
 
@@ -197,6 +197,13 @@ Right now, editing problems created inside LMS hides the deadline. Is that what 
 
 ** TODO: https://github.com/IMSGlobal/basiclti-util-java/blob/master/src/test/java/org/imsglobal/lti/BasicLTIUtilTest.java
 
+
+** TODO: LTI reusable library
+https://github.com/web-cat/web-cat-subsystem-Core/blob/master/src/org/webcat/core/lti/LTILaunchRequest.java
+https://github.com/kstateome/lti-launch
+https://github.com/IMSGlobal/basiclti-util-java
+Clean up https://github.com/cayhorstmann/codecheck2/blob/main/app/models/LTI.java (Tabs, remove dependency on Play, S3)
+
 * LTI consumer
 
 When sending score/state, also cause server to send score as XML to lis_outcome_service_url (TODO: unless the lis_outcome_service_url is with CodeCheck)
@@ -288,14 +295,7 @@ But careful with randomized param.js. Can one even use cookies? Use ccid param w
 
 * Docker
 
-Instead of apparmor: chroot? But a non-root user doesn't have access to any root resources anyway
-https://help.ubuntu.com/community/BasicChroot
-Firejail? https://firejail.wordpress.com/
-
-Killold upon invocation instead of cron?
-
-docker build --tag codecheck:1.0 .
-docker run -p 8080:8080 -it codecheck:1.0
+** Useful Commands
 
 docker ps (only running)
 docker ps -a (running and stopped)
@@ -306,61 +306,95 @@ docker rm <name>
 Shell into container: docker exec -u root -it <name> /bin/bash
 If there is just one: docker exec -u root -it $(docker ps -q) /bin/bash
 Prune all stopped containers: docker system prune
+docker images
 
-Deployment at Google
+** Build/Run
+
+docker build --tag codecheck:1.0 checker/docker
+docker run -p 8080:8080 -it codecheck:1.0
+
+sbt docker:publishLocal 
+docker run -p 9000:9000 --env-file `pwd`/production.env -it play-codecheck:1.0-SNAPSHOT
+
+** Deployment at Google
 
 https://cloud.google.com/run/docs/setup
 
-gcloud builds submit --tag gcr.io/codecheck-docker/comrun
-# Do I have to build in the cloud? docker push
-
+gcloud config set project codecheck-docker
 docker tag codecheck:1.0 gcr.io/codecheck-docker/comrun
 docker push gcr.io/codecheck-docker/comrun
 
 gcloud run deploy comrun \
   --image gcr.io/codecheck-docker/comrun \
+  --port 8080
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated
 
-Service URL 
+Comrun Service URL 
 https://comrun-ic7y4d2pyq-uc.a.run.app
+
+docker tag play-codecheck:1.0-SNAPSHOT gcr.io/codecheck-docker/codecheck
+docker push gcr.io/codecheck-docker/codecheck
+
+gcloud run deploy codecheck \
+  --image gcr.io/codecheck-docker/codecheck \
+  --port 9000 \
+  --set-env-vars=APPLICATION_SECRET=$(grep APPLICATION_SECRET production.env | sed -e 's/^.*=//') \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+
+Codecheck Service URL
+https://codecheck-ic7y4d2pyq-uc.a.run.app/
+
+com.horstmann.codecheck.remote="https://comrun-ic7y4d2pyq-uc.a.run.app/api/upload"
+
 
 TODO: Memory allocated, maximum requests per container, health check
 
-(for f in $(grep -rl --include q.properties type=cc ~/textbook-problems/ebook/bjlo | sed -e 's/.q.properties//') ; do echo $f ; codecheck -d -t -r $f ; done) > /tmp/out4
-TODO: Diff against old (need to take out zip location). There is a testdiff script
 
 Why does this one take 50 seconds?
 samples/cpp/l09
 
-Also check the book code
+** Commit merge
+
+** Extensive tests
+(for f in $(grep -rl --include q.properties type=cc ~/textbook-problems/ebook/bjlo | sed -e 's/.q.properties//') ; do echo $f ; codecheck -d -t -r $f ; done) > /tmp/out4
+TODO: Diff against old (need to take out zip location). There is a testdiff script
+
+** Unify, modernize Util
+** Unify partial language stuff on server
+** // TODO: Removing comments like this is language specific
+
+** Eliminate s3.properties
+
+** Secrets
+
+Had to give Secret Manager Secret Accessor role to  458785619263-compute@developer.gserviceaccount.com 
 
 
+for f in (cat production.env | cut -d= -f1) ; do 
+  gcloud secrets create $f  --replication-policy="automatic" 
+  echo -n $(grep $f production.env | sed -e 's/^.*=//') |  gcloud secrets versions add $f --data-file=-
+done
 
+https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#secretmanager-access-secret-version-java
+https://stackoverflow.com/questions/65302542/how-do-i-use-google-secrets-manager-to-create-a-docker-arg-in-google-cloud-build
+https://stackoverflow.com/questions/65857870/how-to-use-a-google-secret-in-a-deployed-cloud-run-service-managed
+Script to set the pre-launch: https://medium.com/google-cloud/secret-manager-improve-cloud-run-security-without-changing-the-code-634f60c541e6
 
-What about secrets? https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets#secretmanager-access-secret-version-java
+** Is this useful???
 
 Podman?
 https://developers.redhat.com/blog/2019/02/21/podman-and-buildah-for-docker-users/
 https://martinheinz.dev/blog/35?utm_source=tds&utm_medium=referral&utm_campaign=blog_post_35
 
-Is this useful???
 https://jvns.ca/blog/2021/01/23/firecracker--start-a-vm-in-less-than-a-second/
+Instead of apparmor: chroot? But a non-root user doesn't have access to any root resources anyway
+https://help.ubuntu.com/community/BasicChroot
+Firejail? https://firejail.wordpress.com/
 
-* Plans and tasks
-
-** # TIMEOUT relative to solution run? Then need to run solution first
-
-Security problem: Student code can read solution. First run and delete all solutions??? Run student code as student user?
-
-Can't do ulimit globally. But it's sticky, so need to first do all compilations, then the runs
-
-https://fabianlee.org/2020/01/18/docker-placing-limits-on-container-memory-using-cgroups/
-
-show warnings 
-
-//CFLAGS?
 
 * Quarkus
 

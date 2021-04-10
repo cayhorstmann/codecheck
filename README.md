@@ -1,1 +1,1 @@
-For project info, go to the [Wiki](https://github.com/cayhorstmann/codecheck/wiki)
+This project is now obsolete. For the current version, go to https://github.com/cayhorstmann/codecheck2
